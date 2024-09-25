@@ -1,0 +1,23 @@
+# Ignore IntelliJ IDEA project files
+.idea/
+
+# Ignore node_modules in the frontend
+front-end/node_modules/
+
+# Ignore target folder in the frontend
+front-end/target/
+
+#Ignore build folder in the frontend
+front-end/build
+
+# Ignore .mvn folder in the backend
+back-end/.mvn/
+
+#Ignore target folder in the backend
+back-end/target
+
+# Ignore log files
+*.log
+
+# Ignore macOS system files
+.DS_Store
