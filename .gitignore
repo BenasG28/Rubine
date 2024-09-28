@@ -10,6 +10,10 @@ front-end/target/
 #Ignore build folder in the frontend
 front-end/build
 
+#Ignore whatever the fuck node folder is in frontend
+
+front-end/node
+
 # Ignore .mvn folder in the backend
 back-end/.mvn/
 

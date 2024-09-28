@@ -1,8 +1,6 @@
-package com.rubine.backend;
+package com.rubine;
 
-import com.rubine.controllers.UserController;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication()
