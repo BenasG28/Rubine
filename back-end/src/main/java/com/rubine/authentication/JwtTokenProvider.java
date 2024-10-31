@@ -50,7 +50,7 @@ public class JwtTokenProvider {
         }
     }
 
-    public String getUsernameFromToken(String token) {
+    public String getEmailFromToken(String token) {
         return JWT.decode(token).getSubject();
     }
 

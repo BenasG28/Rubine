@@ -1,24 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import Button from '@mui/material/Button';
+import React from 'react';
+import { BrowserRouter as Router, Route, Navigate, Routes } from 'react-router-dom';
+import LoginPage from "./pages/LoginPage";
+import MainPage from "./pages/MainPage";
+import {AuthProvider, useAuth} from "./context/AuthContext";
+import Navbar from "./components/Navbar";
+import {ThemeProvider} from "@mui/material";
+import theme from './theme';
 
 function App() {
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    axios.get('http://localhost:3306')
-      .then(response => setMessage(response.data))
-      .catch(error => console.error('Error fetching data:', error));
-  }, []);
-
-  return (
-    <div>
-      <h1>{message}</h1>
-      <Button variant="contained" color="primary">
-        Shop Now
-      </Button>
-    </div>
-  );
+    return (
+        <Router>
+            <AuthProvider>
+                <ThemeProvider theme={theme}>
+                    <Navbar />
+                    <Routes>
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/main" element={<ProtectedRoute component={MainPage} />} />
+                        <Route path="/" element={<Navigate to="/login" replace />} />
+                    </Routes>
+                </ThemeProvider>
+            </AuthProvider>
+        </Router>
+    );
 }
- 
+
+function ProtectedRoute({component: Component}) {
+    const { isAuthenticated } = useAuth();
+    return isAuthenticated ? <Component /> : <Navigate to="/login" replace />;
+}
+
 export default App;
