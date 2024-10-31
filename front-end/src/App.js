@@ -6,6 +6,10 @@ import {AuthProvider, useAuth} from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import {ThemeProvider} from "@mui/material";
 import theme from './theme';
+import UserListPage from "./pages/UserListPage";
+import ProductListPage from "./pages/ProductListPage";
+import OrderListPage from "./pages/OrderListPage";
+import ReportListPage from "./pages/ReportListPage";
 
 function App() {
     return (
@@ -16,6 +20,10 @@ function App() {
                     <Routes>
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/main" element={<ProtectedRoute component={MainPage} />} />
+                        <Route path={"/users"} element={<ProtectedRoute component={UserListPage} />} />
+                        <Route path={"/products"} element={<ProtectedRoute component={ProductListPage} />} />
+                        <Route path={"/orders"} element={<ProtectedRoute component={OrderListPage} />} />
+                        <Route path={"/reports"} element={<ProtectedRoute component={ReportListPage} />} />
                         <Route path="/" element={<Navigate to="/login" replace />} />
                     </Routes>
                 </ThemeProvider>

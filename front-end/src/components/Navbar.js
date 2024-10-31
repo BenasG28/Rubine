@@ -13,6 +13,10 @@ const Navbar = () => {
                 {token && (
                     <>
                         <Button color="inherit" component={Link} to="/main">Pagrindinis</Button>
+                        <Button color={"inherit"} component={Link} to={"/users"}>Vartotojai</Button>
+                        <Button color={"inherit"} component={Link} to={"/products"}>Prekės</Button>
+                        <Button color={"inherit"} component={Link} to={"/orders"}>Užsakymai</Button>
+                        <Button color={"inherit"} component={Link} to={"/reports"}>Ataskaitos</Button>
                         <Button color="inherit" onClick={logout} style={{ marginLeft: '16px' }}>Atsijungti</Button>
                     </>
                 )}
