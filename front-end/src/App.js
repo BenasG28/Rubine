@@ -33,7 +33,12 @@ function App() {
 }
 
 function ProtectedRoute({component: Component}) {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, loading } = useAuth();
+
+    if (loading) {
+        return <div>Loading...</div>
+    }
+
     return isAuthenticated ? <Component /> : <Navigate to="/login" replace />;
 }
 
