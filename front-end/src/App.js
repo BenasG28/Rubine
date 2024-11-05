@@ -10,6 +10,9 @@ import UserListPage from "./pages/UserListPage";
 import ProductListPage from "./pages/ProductListPage";
 import OrderListPage from "./pages/OrderListPage";
 import ReportListPage from "./pages/ReportListPage";
+import axios from "axios";
+
+axios.defaults.baseURL = 'http://localhost:8080';
 
 function App() {
     return (

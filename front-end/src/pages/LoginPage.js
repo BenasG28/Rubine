@@ -9,19 +9,19 @@ const LoginPage = () => {
     const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState(null); // State for error handling
-    const [openSnackbar, setOpenSnackbar] = useState(false); // State for Snackbar
+    const [error, setError] = useState(null);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8080/auth/login', { email, password });
+            const response = await axios.post('/auth/login', { email, password });
             const token = response.data.token;
-            login(token); // Update the token in context
+            login(token);
         } catch (error) {
             console.error('Login error', error);
-            setError('Invalid email or password'); // Set error message
-            setOpenSnackbar(true); // Open Snackbar
+            setError('Invalid email or password');
+            setOpenSnackbar(true);
         }
     };
 
@@ -59,7 +59,6 @@ const LoginPage = () => {
                 <Button type="submit" variant="contained" color="primary" fullWidth>Prisijungti</Button>
             </form>
 
-            {/* Snackbar for error messages */}
             <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
                 <Alert onClose={handleCloseSnackbar} severity="error" sx={{ width: '100%' }}>
                     {error}

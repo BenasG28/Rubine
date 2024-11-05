@@ -1,5 +1,6 @@
 package com.rubine.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,7 @@ public class User {
     private String name;
     private String surname;
     private String email;
+    @JsonIgnore
     private String password;
     private String phoneNumber;
     private Gender gender;

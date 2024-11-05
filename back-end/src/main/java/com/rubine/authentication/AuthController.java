@@ -1,7 +1,6 @@
 package com.rubine.authentication;
 
-import com.rubine.user.CustomUserDetailsService;
-import com.rubine.user.UserRepository;
+import com.rubine.user.*;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,11 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -46,7 +46,24 @@ public class AuthController {
             logger.warn("Failed login attempt for email: {}", userLoginRequest.getEmail());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
         }
+    }
 
+    @GetMapping("/user")
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
 
+        String email = userDetails.getUsername();
+
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+                new UsernameNotFoundException(String.format("User %s not found", email)));
+
+        List<String> roleNames = user.getRoles().stream()
+                .map(Role::getName)
+                .toList();
+
+        UserResponse userResponse = new UserResponse(userDetails.getUsername(), roleNames);
+        return ResponseEntity.ok(userResponse);
     }
 }

@@ -1,10 +1,12 @@
 package com.rubine.config;
 
+import com.rubine.authentication.CustomAuthorizationFilter;
 import com.rubine.authentication.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -22,12 +24,16 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAuthorizationFilter customAuthorizationFilter; // Add your custom filter
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, CustomAuthorizationFilter customAuthorizationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.customAuthorizationFilter = customAuthorizationFilter;
     }
 
     @Bean
@@ -48,10 +54,13 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/auth/login").permitAll();
+                    auth.requestMatchers("/users").hasRole("SYS_ADMIN");
+                    auth.requestMatchers("/auth/user").permitAll();
                     // TODO: Add roles for specific endpoints
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(customAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
