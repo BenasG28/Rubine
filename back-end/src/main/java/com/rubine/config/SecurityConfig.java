@@ -49,7 +49,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/auth/login").permitAll();
                     auth.requestMatchers("/users/all").hasRole("SYS_ADMIN");
-                    auth.requestMatchers("/auth/user").permitAll();
                     // TODO: Add roles for specific endpoints
                     auth.anyRequest().authenticated();
                 })
