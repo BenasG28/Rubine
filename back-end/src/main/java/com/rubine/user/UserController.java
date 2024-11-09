@@ -16,9 +16,13 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping
+    @GetMapping("/all")
     private ResponseEntity<List<User>> getAllUsers() {
+        System.out.println("invoked");
         List<User> users = userRepository.findAll();
+        if (users.isEmpty()) {
+            System.out.println("bad");
+        }
         return ResponseEntity.ok(users);
     }
 }
