@@ -3,6 +3,7 @@ package com.rubine.config;
 import com.rubine.authentication.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -50,6 +51,11 @@ public class SecurityConfig {
                     auth.requestMatchers("/auth/login").permitAll();
                     auth.requestMatchers("/users/all").hasRole("SYS_ADMIN");
                     auth.requestMatchers("/auth/user").permitAll();
+                    auth.requestMatchers("/products/all").hasAnyRole("SYS_ADMIN", "ADMIN");
+                    auth.requestMatchers(HttpMethod.DELETE, "/products/delete/{id}").authenticated();
+                    auth.requestMatchers("/products/create").hasAnyRole("SYS_ADMIN", "ADMIN");
+                    auth.requestMatchers(HttpMethod.PUT,"/products/update/{id}").authenticated();
+                    auth.requestMatchers("/products/update/**").hasAnyRole("SYS_ADMIN", "ADMIN");
                     // TODO: Add roles for specific endpoints
                     auth.anyRequest().authenticated();
                 })
@@ -62,7 +68,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8080", "http://localhost:3306"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
@@ -71,4 +77,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 }
