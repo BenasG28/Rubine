@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [roles, setRoles] = useState([]);
     const navigate = useNavigate();
+
     const fetchUserRoles = useCallback(async (token) => {
         try {
             const response = await axios.get("/auth/user", {
@@ -18,6 +19,7 @@ export const AuthProvider = ({ children }) => {
                 },
             });
             setRoles(response.data.roles);
+            localStorage.setItem('roles', JSON.stringify(response.data.roles));
         } catch (error) {
             console.error("Error fetching user roles:", error);
             localStorage.removeItem('token');
@@ -27,16 +29,25 @@ export const AuthProvider = ({ children }) => {
             navigate('/login');
         }
     }, [navigate]);
+
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
+        const storedRoles = localStorage.getItem('roles');
+
         const initializeAuthentication = async () => {
             if (storedToken) {
                 setToken(storedToken);
                 setIsAuthenticated(true);
-                await fetchUserRoles(storedToken);
+
+                if (!storedRoles) {
+                    await fetchUserRoles(storedToken);
+                } else {
+                    setRoles(JSON.parse(storedRoles));
+                }
             }
             setLoading(false);
-        }
+        };
+
         initializeAuthentication().catch((error) => {
             console.error("Error during authentication initialization:", error);
             setLoading(false);
@@ -47,15 +58,12 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('token', newToken);
         setToken(newToken);
         setIsAuthenticated(true);
-        fetchUserRoles(newToken).catch((error) => {
-            console.error("Error fetching user roles during login:", error);
-            logout();
-        });
         navigate('/main');
     };
 
     const logout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('roles');
         setToken(null);
         setIsAuthenticated(false);
         setRoles([]);
