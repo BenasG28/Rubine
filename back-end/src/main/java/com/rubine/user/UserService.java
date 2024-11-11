@@ -37,9 +37,7 @@ public class UserService {
             throw new IllegalArgumentException("Password cannot be empty");
         }
 
-        Set<Role> roles = user.getRoles().stream()
-                .map(roleName -> roleRepository.findByName(roleName.getName()))
-                .collect(Collectors.toSet());
+        Set<Role> roles = getValidRoles(user.getRoles());
         user.setRoles(roles);
         return userRepository.save(user);
     }
@@ -56,9 +54,7 @@ public class UserService {
         user.setGender(updatedUser.getGender());
         user.setBirthDate(updatedUser.getBirthDate());
         user.setSelectedRegion(updatedUser.getSelectedRegion());
-        Set<Role> updatedRoles = updatedUser.getRoles().stream()
-                .map(roleName -> roleRepository.findByName(roleName.getName()))
-                .collect(Collectors.toSet());
+        Set<Role> updatedRoles = getValidRoles(updatedUser.getRoles());
         user.setRoles(updatedRoles);
         return userRepository.save(user);
     }
@@ -66,4 +62,12 @@ public class UserService {
     public void deleteUser(User user) {
         userRepository.delete(user);
     }
+
+    private Set<Role> getValidRoles(Set<Role> roles) {
+        return roles.stream()
+                .map(role -> roleRepository.findByName(role.getName())
+                        .orElseThrow(() -> new IllegalArgumentException("Role not found: " + role.getName())))
+                .collect(Collectors.toSet());
+    }
+
 }
