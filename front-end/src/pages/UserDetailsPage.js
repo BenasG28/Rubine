@@ -233,6 +233,7 @@ const UserDetailsPage = () => {
                                 select
                                 label="Lytis"
                                 variant="outlined"
+                                disabled={!isEditMode}
                                 fullWidth
                                 margin="normal"
                                 helperText={errors.gender?.message}
@@ -275,6 +276,7 @@ const UserDetailsPage = () => {
                                 label="Regionas"
                                 select
                                 variant="outlined"
+                                disabled={!isEditMode}
                                 fullWidth
                                 margin="normal"
                                 helperText={errors.selectedRegion?.message}
