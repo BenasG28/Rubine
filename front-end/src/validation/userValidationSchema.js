@@ -47,7 +47,10 @@ const userValidationSchema = yup.object({
         .required("Lytis yra privaloma"),
 
     birthDate: yup
-        .string()
+        .date()
+        .transform((value, originalValue) => {
+            return originalValue === "" ? null : value;
+        })
         .nullable()
         .required("Gimimo data yra privaloma")
         .max(new Date(), "Gimimo data negali būti ateityje"),
