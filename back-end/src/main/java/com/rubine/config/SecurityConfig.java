@@ -51,11 +51,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/auth/login").permitAll();
                     auth.requestMatchers("/users/all").hasRole("SYS_ADMIN");
                     auth.requestMatchers("/auth/user").permitAll();
-                    auth.requestMatchers("/products/all").hasAnyRole("SYS_ADMIN", "ADMIN");
-                    auth.requestMatchers(HttpMethod.DELETE, "/products/delete/{id}").authenticated();
-                    auth.requestMatchers("/products/create").hasAnyRole("SYS_ADMIN", "ADMIN");
-                    auth.requestMatchers(HttpMethod.PUT,"/products/update/{id}").authenticated();
-                    auth.requestMatchers("/products/update/**").hasAnyRole("SYS_ADMIN", "ADMIN");
+                    auth.requestMatchers("/products/**").hasAnyRole("SYS_ADMIN", "ADMIN");
                     // TODO: Add roles for specific endpoints
                     auth.anyRequest().authenticated();
                 })
