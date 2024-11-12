@@ -49,9 +49,9 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/auth/login").permitAll();
-                    auth.requestMatchers("/users/all").hasRole("SYS_ADMIN");
-                    auth.requestMatchers("/auth/user").permitAll();
+                    auth.requestMatchers("/users/**").hasAnyRole("SYS_ADMIN", "ADMIN");
                     auth.requestMatchers("/products/**").hasAnyRole("SYS_ADMIN", "ADMIN");
+
                     // TODO: Add roles for specific endpoints
                     auth.anyRequest().authenticated();
                 })
