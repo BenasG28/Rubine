@@ -1,6 +1,8 @@
 package com.rubine.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.rubine.order.Order;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -46,6 +48,9 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     @NotEmpty(message = "At least one role is required")
     private Set<Role> roles;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Order> orders;
 
     public User(long id, String name, String surname, String email, Set<Role> roles) {
         this.id = id;

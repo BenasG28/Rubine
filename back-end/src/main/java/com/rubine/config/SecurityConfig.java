@@ -53,6 +53,17 @@ public class SecurityConfig {
                     auth.requestMatchers("/products/**").hasAnyRole("SYS_ADMIN", "ADMIN");
 
                     // TODO: Add roles for specific endpoints
+                    auth.requestMatchers("/auth/login").permitAll(); // Public access for login
+
+                    // Allow all users to view orders
+                    //auth.requestMatchers("/orders/all").permitAll();
+
+                    auth.requestMatchers("/orders/all").hasAnyRole("SYS_ADMIN", "ADMIN"); // View all orders
+                    auth.requestMatchers(HttpMethod.POST, "/orders/create").hasAnyRole("SYS_ADMIN", "ADMIN"); // Create orders
+                    auth.requestMatchers(HttpMethod.PUT, "/orders/{orderId}").hasAnyRole("SYS_ADMIN", "ADMIN"); // Update order by ID
+                    auth.requestMatchers(HttpMethod.DELETE, "/orders/{orderId}").hasAnyRole("SYS_ADMIN", "ADMIN"); // Delete order by ID
+
+                    // Authenticate all other requests by default
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -73,5 +84,4 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 }
