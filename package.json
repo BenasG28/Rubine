@@ -1,5 +1,15 @@
 {
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@hookform/resolvers": "^3.9.1",
+    "@mui/material": "^6.1.7",
+    "@mui/x-date-pickers": "^7.22.2",
+    "date-fns": "^4.1.0",
+    "react-hook-form": "^7.53.2",
+    "yup": "^1.4.0"
   }
 }
