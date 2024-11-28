@@ -10,6 +10,7 @@ import UserListPage from "./pages/UserListPage";
 import ProductListPage from "./pages/ProductListPage";
 import OrderListPage from "./pages/OrderListPage";
 import ReportListPage from "./pages/ReportListPage";
+import ProductDetailsPage from "./pages/ProductDetailsPage";
 import axios from "axios";
 import UserDetailsPage from "./pages/UserDetailsPage";
 
@@ -28,6 +29,7 @@ function App() {
                         <Route path={"/user-details/:userId"} element={<ProtectedRoute component={UserDetailsPage} />} />
                         <Route path={"/products"} element={<ProtectedRoute component={ProductListPage} />} />
                         <Route path={"/orders"} element={<ProtectedRoute component={OrderListPage} />} />
+                        <Route path={"/products/:productId"} element={<ProtectedRoute component={ProductDetailsPage} />} />
                         <Route path={"/reports"} element={<ProtectedRoute component={ReportListPage} />} />
                         <Route path="/" element={<Navigate to="/login" replace />} />
                     </Routes>

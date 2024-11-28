@@ -3,8 +3,23 @@ import { useAuth } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
 import axios from 'axios';
 import {
-    Container, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead,
-    TableRow, Paper, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Box, MenuItem, Select
+    Button,
+    Typography,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    Box,
+    RadioGroup,
+    FormControlLabel, Radio
 } from '@mui/material';
 
 
@@ -57,7 +72,6 @@ const ProductListPage = () => {
             .catch(error => console.error("Error creating product:", error));
     };
 
-
     const handleEditProduct = () => {
         if (editProduct && editProduct.id) {
             axios.put(`/products/update/${editProduct.id}`, editProduct, {
@@ -75,7 +89,6 @@ const ProductListPage = () => {
                 .catch(error => console.error("Error updating product:", error));
         }
     };
-
 
     const handleDeleteProduct = (id) => {
         axios.delete(`/products/delete/${id}`, {
@@ -100,7 +113,6 @@ const ProductListPage = () => {
             productType: ''
         });
     };
-
     //------------------------------[EDIT]--------------------------------------------
     const handleEditOpen = (product) => {
         setEditProduct(product);
@@ -114,29 +126,67 @@ const ProductListPage = () => {
 
 
     return (
-        <Container>
-            <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                marginTop={4}>
-                <Typography variant="h4" gutterBottom>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+                minHeight: '100vh',
+                padding: 2,
+            }}
+        >
+            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography
+                    variant="h5"
+                    sx={{
+                        marginBottom: 3,
+                        display: 'inline-block',
+                        fontFamily: 'Montserrat, Arial, sans-serif',
+                        fontSize: '32px',
+                        fontWeight: 600,
+                        height: '40px',
+                        textTransform: 'none',
+                        verticalAlign: 'middle',
+                        WebkitFontSmoothing: 'antialiased', // To apply webkit smoothing
+                    }}
+                >
                     Produktų sąrašas
                 </Typography>
-            </Box>
-
-            <Box display="flex" justifyContent="flex-end" marginBottom={2}>
                 <Button
                     variant="contained"
                     color="primary"
                     onClick={handleClickOpen}
+                    sx={{
+                        marginBottom: 3,
+                        fontFamily: 'Montserrat, Arial, sans-serif', // Match the font family
+                        fontSize: '16px', // Adjust font size for readability
+                        fontWeight: 300, // Semi-bold text for a stronger appearance
+                        letterSpacing: '0.5px', // Slight spacing for better readability
+                        textTransform: 'none', // Remove automatic uppercase
+                        padding: '10px 20px', // Adjust padding for a larger, more clickable area
+                        borderRadius: '8px', // Rounded corners for a modern look
+                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Subtle shadow for depth
+                        transition: 'background-color 0.3s ease, transform 0.3s ease', // Smooth transition for hover effect
+                        '&:hover': {
+                            backgroundColor: 'primary.dark',
+                            transform: 'scale(1.05)',
+                        },
+                        '&:active': {
+                            backgroundColor: 'primary.main',
+                            transform: 'scale(1)',
+                        },
+                        '&:focus': {
+                            outline: 'none',
+                        },
+                    }}
                 >
-                    Naujas produktas
+                    NAUJAS PRODUKTAS
                 </Button>
             </Box>
 
-            <TableContainer component={Paper}>
-                <Table>
+            <TableContainer component={Paper} sx={{ width: '100%' }}>
+                <Table sx={{ width: '100%' }}>
                     <TableHead>
                         <TableRow>
                             <TableCell>ID</TableCell>
@@ -168,7 +218,7 @@ const ProductListPage = () => {
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={5} align="center">
+                                <TableCell colSpan={8} align="center">
                                     Nėra produktų sąraše
                                 </TableCell>
                             </TableRow>
@@ -222,17 +272,14 @@ const ProductListPage = () => {
                         value={newProduct.price}
                         onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
                     />
-                    <Select
-                        margin="dense"
-                        label="Produkto tipas"
-                        fullWidth
+                    <RadioGroup
+                        row
                         value={newProduct.productType}
                         onChange={(e) => setNewProduct({ ...newProduct, productType: e.target.value })}
-                     variant="outlined"
                     >
-                        <MenuItem value="UPPERBODY">Viršutinė Kūno Dalis</MenuItem>
-                        <MenuItem value="LOWERBODY">Apatinė Kūno Dalis</MenuItem>
-                    </Select>
+                        <FormControlLabel value="UPPERBODY" control={<Radio />} label="Viršutinė Kūno Dalis" />
+                        <FormControlLabel value="LOWERBODY" control={<Radio />} label="Apatinė Kūno Dalis" />
+                    </RadioGroup>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="secondary">Atšaukti</Button>
@@ -285,24 +332,21 @@ const ProductListPage = () => {
                         value={editProduct?.price || ""}
                         onChange={(e) => setEditProduct({ ...editProduct, price: e.target.value })}
                     />
-                    <Select
-                        margin="dense"
-                        label="Produkto tipas"
-                        type="text"
-                        fullWidth
+                    <RadioGroup
+                        row
                         value={editProduct?.productType || ""}
                         onChange={(e) => setEditProduct({ ...editProduct, productType: e.target.value })}
-                        variant="outlined">
-                        <MenuItem value="UPPERBODY">Viršutinė Kūno Dalis</MenuItem>
-                        <MenuItem value="LOWERBODY">Apatinė Kūno Dalis</MenuItem>
-                    </Select>
+                    >
+                        <FormControlLabel value="UPPERBODY" control={<Radio />} label="Viršutinė Kūno Dalis" />
+                        <FormControlLabel value="LOWERBODY" control={<Radio />} label="Apatinė Kūno Dalis" />
+                    </RadioGroup>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleEditClose} color="secondary">Atšaukti</Button>
                     <Button onClick={handleEditProduct} color="primary">Atnaujinti</Button>
                 </DialogActions>
             </Dialog>
-        </Container>
+        </Box>
     );
 };
 export default ProductListPage;

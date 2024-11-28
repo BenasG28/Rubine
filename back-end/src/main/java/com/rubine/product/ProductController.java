@@ -1,16 +1,22 @@
 package com.rubine.product;
 
+import com.rubine.user.User;
+import com.rubine.user.UserController;
+import jakarta.persistence.Id;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import static org.hibernate.internal.CoreLogging.logger;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
-
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private ProductService productService;  // Inject the ProductService
 
@@ -48,6 +54,16 @@ public class ProductController {
         Product createdProduct = productService.saveProduct(product);  // Use service to save the product
         return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);  // 201 Created with the product
     }
+    @GetMapping("/{productId}")
+    public ResponseEntity<Product> getProductById(@PathVariable Long productId) {
+        return productService.getProductById(productId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> {
+                    logger.warn("Product with ID {} not found", productId);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                });
+    }
+
 
     // Delete product by ID
     @DeleteMapping("/delete/{id}")
