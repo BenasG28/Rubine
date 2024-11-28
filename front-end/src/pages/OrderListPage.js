@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
 import axios from 'axios';
 import {
-    Container, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead,
+    Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead,
     TableRow, Paper, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Box, MenuItem, Select
 } from '@mui/material';
 // TODO Make radio buttons for statuses
@@ -86,16 +86,62 @@ const OrderListPage = () => {
     }
 
     return (
-        <Container>
-            <Box display="flex" justifyContent="center" alignItems="center" marginTop={4}>
-                <Typography variant="h4" gutterBottom>
-                    Orders List
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+                minHeight: '100vh',
+                padding: 2,
+            }}
+        >
+            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography
+                    variant="h5"
+                    sx={{
+                        marginBottom: 3,
+                        display: 'inline-block',
+                        fontFamily: 'Montserrat, Arial, sans-serif',
+                        fontSize: '32px',
+                        fontWeight: 600,
+                        height: '40px',
+                        textTransform: 'none',
+                        verticalAlign: 'middle',
+                        WebkitFontSmoothing: 'antialiased', // To apply webkit smoothing
+                    }}
+                >
+                    Užsakymų sąrašas
                 </Typography>
-            </Box>
-
-            <Box display="flex" justifyContent="flex-end" marginBottom={2}>
-                <Button variant="contained" color="primary" onClick={handleClickOpen}>
-                    New Order
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleClickOpen}
+                    sx={{
+                        marginBottom: 3,
+                        fontFamily: 'Montserrat, Arial, sans-serif', // Match the font family
+                        fontSize: '16px', // Adjust font size for readability
+                        fontWeight: 300, // Semi-bold text for a stronger appearance
+                        letterSpacing: '0.5px', // Slight spacing for better readability
+                        textTransform: 'none', // Remove automatic uppercase
+                        padding: '10px 20px', // Adjust padding for a larger, more clickable area
+                        borderRadius: '8px', // Rounded corners for a modern look
+                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Subtle shadow for depth
+                        transition: 'background-color 0.3s ease, transform 0.3s ease', // Smooth transition for hover effect
+                        '&:hover': {
+                            backgroundColor: 'primary.dark',
+                            transform: 'scale(1.05)',
+                        },
+                        '&:active': {
+                            backgroundColor: 'primary.main',
+                            transform: 'scale(1)',
+                        },
+                        '&:focus': {
+                            outline: 'none',
+                        },
+                    }}
+                >
+                NAUJAS UŽSAKYMAS
                 </Button>
             </Box>
 
@@ -228,7 +274,7 @@ const OrderListPage = () => {
                     <Button onClick={handleEditOrder} color="primary">Update</Button>
                 </DialogActions>
             </Dialog>
-        </Container>
+        </Box>
     );
 };
 

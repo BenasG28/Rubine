@@ -26,6 +26,7 @@ public class ProductService {
     public Product saveProduct(Product product) {
         return productRepository.save(product);
     }
+    public Optional<Product> getProductById(Long id) {return productRepository.findById(id);}
 
     // Update an existing product (PUT /products/update/{id})
     public Product updateProduct(Long id, Product updatedProduct) {
