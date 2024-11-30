@@ -63,7 +63,7 @@ public class AuthController {
                 .map(Role::getName)
                 .toList();
 
-        UserResponse userResponse = new UserResponse(userDetails.getUsername(), roleNames);
+        UserResponse userResponse = new UserResponse(user.getId(), userDetails.getUsername(), roleNames);
         return ResponseEntity.ok(userResponse);
     }
 }

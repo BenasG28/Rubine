@@ -194,6 +194,7 @@ const OrderListPage = () => {
                         type="date"
                         fullWidth
                         value={newOrder.dateCreated}
+                        slotProps={{inputLabel: {shrink: true} }}
                         onChange={(e) => setNewOrder({ ...newOrder, dateCreated: e.target.value })}
                     />
                     <TextField

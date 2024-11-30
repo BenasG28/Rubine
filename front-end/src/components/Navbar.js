@@ -1,10 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {Toolbar, Button, Typography, Box } from "@mui/material";
+import {Toolbar, Button, Typography, Box, IconButton, Badge} from "@mui/material";
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useAuth } from "../context/AuthContext";
+import {useCart} from "../context/CartContext";
 
 const Navbar = () => {
     const { token, roles, logout } = useAuth();
+
+    const { cart } = useCart();
 
     return (
             <Box sx={{
@@ -29,14 +33,24 @@ const Navbar = () => {
                                     <Button color="inherit" component={Link} to="/users">Vartotojai</Button>
                                     <Button color="inherit" component={Link} to="/products">Prekės</Button>
                                     {/* Uncomment if you want reports */}
-                                    {/* <Button color="inherit" component={Link} to="/reports">Ataskaitos</Button> */}
+                                     <Button color="inherit" component={Link} to="/reports">Ataskaitos</Button>
                                 </>
                             )}
 
                             {/* Common Link for Orders */}
                             <Button color="inherit" component={Link} to="/orders">Užsakymai</Button>
 
-                            {/* Logout Button */}
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                {token && (
+                                    <>
+                                        <IconButton color="inherit" component={Link} to="/cart">
+                                            <Badge badgeContent={cart?.items?.length || 0} color="secondary">
+                                                <ShoppingCartIcon />
+                                            </Badge>
+                                        </IconButton>
+                                    </>
+                                )}
+                            </Box>
                             <Button color="inherit" onClick={logout} sx={{ marginLeft: '22px' }}>Atsijungti</Button>
                         </>
                     )}

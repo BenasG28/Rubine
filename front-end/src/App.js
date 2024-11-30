@@ -13,27 +13,33 @@ import ReportListPage from "./pages/ReportListPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import axios from "axios";
 import UserDetailsPage from "./pages/UserDetailsPage";
+import {CartProvider} from "./context/CartContext";
+import CartPage from "./pages/CartPage";
 
 axios.defaults.baseURL = 'http://localhost:8080';
+
 
 function App() {
     return (
         <Router>
             <AuthProvider>
-                <ThemeProvider theme={theme}>
-                    <Navbar />
-                    <Routes>
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/main" element={<ProtectedRoute component={MainPage} />} />
-                        <Route path={"/users"} element={<ProtectedRoute component={UserListPage} />} />
-                        <Route path={"/user-details/:userId"} element={<ProtectedRoute component={UserDetailsPage} />} />
-                        <Route path={"/products"} element={<ProtectedRoute component={ProductListPage} />} />
-                        <Route path={"/orders"} element={<ProtectedRoute component={OrderListPage} />} />
-                        <Route path={"/products/:productId"} element={<ProtectedRoute component={ProductDetailsPage} />} />
-                        <Route path={"/reports"} element={<ProtectedRoute component={ReportListPage} />} />
-                        <Route path="/" element={<Navigate to="/login" replace />} />
-                    </Routes>
-                </ThemeProvider>
+                <CartProvider>
+                    <ThemeProvider theme={theme}>
+                        <Navbar />
+                        <Routes>
+                            <Route path="/login" element={<LoginPage />} />
+                            <Route path="/main" element={<ProtectedRoute component={MainPage} />} />
+                            <Route path={"/users"} element={<ProtectedRoute component={UserListPage} />} />
+                            <Route path={"/user-details/:userId"} element={<ProtectedRoute component={UserDetailsPage} />} />
+                            <Route path={"/products"} element={<ProtectedRoute component={ProductListPage} />} />
+                            <Route path={"/orders"} element={<ProtectedRoute component={OrderListPage} />} />
+                            <Route path={"/products/:productId"} element={<ProtectedRoute component={ProductDetailsPage} />} />
+                            <Route path={"/reports"} element={<ProtectedRoute component={ReportListPage} />} />
+                            <Route path={"/cart"} element={<ProtectedRoute component={CartPage}/>} />
+                            <Route path="/" element={<Navigate to="/login" replace />} />
+                        </Routes>
+                    </ThemeProvider>
+                </CartProvider>
             </AuthProvider>
         </Router>
     );

@@ -1,6 +1,5 @@
 package com.rubine.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.rubine.order.Order;
 import jakarta.persistence.*;
@@ -21,7 +20,7 @@ import java.util.Set;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @NotBlank(message = "Name is required")
     private String name;
     @NotBlank(message = "Surname is required")

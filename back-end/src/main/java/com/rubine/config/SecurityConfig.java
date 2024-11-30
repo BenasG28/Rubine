@@ -61,6 +61,7 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.POST, "/orders/create").hasAnyRole("SYS_ADMIN", "ADMIN"); // Create orders
                     auth.requestMatchers(HttpMethod.PUT, "/orders/{orderId}").hasAnyRole("SYS_ADMIN", "ADMIN"); // Update order by ID
                     auth.requestMatchers(HttpMethod.DELETE, "/orders/{orderId}").hasAnyRole("SYS_ADMIN", "ADMIN"); // Delete order by ID
+                    auth.requestMatchers("/cart/**").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

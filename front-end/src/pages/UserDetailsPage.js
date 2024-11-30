@@ -260,9 +260,7 @@ const UserDetailsPage = () => {
                                 error={!!errors.birthDate}
                                 helperText={errors.birthDate?.message}
                                 // TODO fix this deprecated shit
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
+                                slotProps={{inputLabel: {shrink: true} }}
                             />
                         )}
                     />

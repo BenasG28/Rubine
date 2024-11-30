@@ -1,8 +1,16 @@
 import React from 'react';
 import { Typography, Box, CardMedia } from '@mui/material';
+import {useCart} from "../context/CartContext";
+import Button from "@mui/material/Button";
 
 const ProductDetail = ({ product }) => {
+    const { addItemToCart } = useCart();
+
     if (!product) return null; // Handle cases where product data is not yet available
+
+    const handleAddToCart = () => {
+        addItemToCart(product.id, 1);
+    }
 
     return (
         <Box
@@ -64,6 +72,15 @@ const ProductDetail = ({ product }) => {
                 <Typography variant="body1" gutterBottom>
                     <strong>Tipas</strong> {product.productType}
                 </Typography>
+
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleAddToCart}
+                    sx={{ marginTop: 2 }}
+                >
+                    Add to Cart
+                </Button>
             </Box>
         </Box>
     );

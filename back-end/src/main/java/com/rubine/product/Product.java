@@ -18,7 +18,7 @@ import java.util.List;
 public class Product implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     Double price;
     String description;
     String imageUrl;
