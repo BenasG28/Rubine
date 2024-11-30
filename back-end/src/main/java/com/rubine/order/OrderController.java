@@ -1,6 +1,5 @@
 package com.rubine.order;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,11 +10,15 @@ import java.util.List;
 @RequestMapping("/orders")
 public class OrderController {
 
-    @Autowired
-    private OrderService orderService;
+    private final OrderService orderService;
+    private final OrderRepository orderRepository;
+    private final OrderMapper orderMapper;
 
-    @Autowired
-    private OrderRepository orderRepository;
+    public OrderController(OrderService orderService, OrderRepository orderRepository, OrderMapper orderMapper) {
+        this.orderService = orderService;
+        this.orderRepository = orderRepository;
+        this.orderMapper = orderMapper;
+    }
 
     // Get all orders
     @GetMapping("/all")
@@ -69,5 +72,11 @@ public class OrderController {
             return ResponseEntity.noContent().build();  // 204 No Content on successful deletion
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();  // 404 Not Found if order doesn't exist
+    }
+
+    @PostMapping("/{userId}/place")
+    public OrderDto placeOrder(@PathVariable Long userId, @RequestBody PaymentRequest paymentRequest) {
+        Order order = orderService.placeOrder(userId, paymentRequest.getPaymentMethod(), paymentRequest.getCardNumber());
+        return orderMapper.toOrderDto(order);
     }
 }

@@ -79,7 +79,7 @@ const ProductDetail = ({ product }) => {
                     onClick={handleAddToCart}
                     sx={{ marginTop: 2 }}
                 >
-                    Add to Cart
+                    Pridėti į krepšelį
                 </Button>
             </Box>
         </Box>
