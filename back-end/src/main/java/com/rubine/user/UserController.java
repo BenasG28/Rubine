@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,24 +14,26 @@ import java.util.Optional;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final UserMapper userMapper;
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserMapper userMapper) {
         this.userService = userService;
+        this.userMapper = userMapper;
     }
 
     //TODO Implement difference in data retrieval for SYS_ADMIN and ADMIN (password, other sensitive info).
 
     @GetMapping("/all")
-    private ResponseEntity<List<User>> getAllUsers() {
+    private ResponseEntity<List<UserDto>> getAllUsers() {
         try {
             List<User> users = userService.getAllUsers();
             if (users.isEmpty()) {
                 logger.warn("No users found");
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(users);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(userMapper.toUserDtoList(users));
             }
-            return ResponseEntity.ok(users);
+            return ResponseEntity.ok(userMapper.toUserDtoList(users));
         } catch (Exception e) {
             logger.error("Error getting all users", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -38,20 +41,17 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<User> getUserById(@PathVariable Long userId) {
-        return userService.getUserById(userId)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> {
-                    logger.warn("User with ID {} not found", userId);
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-                });
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long userId) {
+         User user = userService.getUserById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return ResponseEntity.ok(userMapper.toUserDto(user));
     }
 
     @PostMapping("/create")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<UserDto> createUser(@RequestBody User user) {
         try {
             User savedUser = userService.createUser(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+            return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.toUserDto(user));
         } catch (Exception e) {
             logger.error("Error creating user", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -76,11 +76,11 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody User updatedUser) {
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long userId, @RequestBody User updatedUser) {
         return userService.getUserById(userId)
                 .map(existingUser -> {
                     User savedUser = userService.updateUser(existingUser, updatedUser);
-                    return ResponseEntity.ok(savedUser);
+                    return ResponseEntity.ok(userMapper.toUserDto(savedUser));
                 })
                 .orElseGet(() -> {
                     logger.warn("User with ID {} not found for updating", userId);

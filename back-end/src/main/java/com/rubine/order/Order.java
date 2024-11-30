@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "orders") //"order" is a reserved name in SQL or MySQL lol fml
@@ -20,28 +21,25 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(nullable = true)
+    @Column
     private LocalDate dateCreated;
 
-    @Column(nullable = true)
+    @Column
     private Double purchaseAmount;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = true)
+    @Column
     private OrderStatus status;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = true)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Override
-    public String toString() {
-        return "Order{" +
-                "id=" + id +
-                ", dateCreated=" + dateCreated +
-                ", purchaseAmount=" + purchaseAmount +
-                ", status=" + status +
-                ", user=" + user +
-                '}';
-    }
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<LineItem> lineItems;
+
+    private PaymentMethod paymentMethod;
+
+    private boolean isPaid;
+
 }
