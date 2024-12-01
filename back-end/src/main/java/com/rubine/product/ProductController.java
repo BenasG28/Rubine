@@ -2,6 +2,7 @@ package com.rubine.product;
 
 import com.rubine.user.User;
 import com.rubine.user.UserController;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.Id;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -73,5 +74,24 @@ public class ProductController {
             return ResponseEntity.noContent().build();  // 204 No Content on successful deletion
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();  // 404 Not Found if product doesn't exist
+    }
+
+    @PutMapping("/updateStock/{productId}")
+    public ResponseEntity<ProductStock> updateStock(
+            @PathVariable Long productId,
+            @RequestBody ProductStockRequest request) {
+        try {
+            // Convert size to uppercase before parsing
+            ProductStock productStock = productService.updateProductStock(
+                    productId,
+                    ProductSize.valueOf(request.getSize().toUpperCase()),
+                    request.getQuantity()
+            );
+            return ResponseEntity.ok(productStock);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // Return 400 Bad Request with no body
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Return 404 Not Found with no body
+        }
     }
 }

@@ -7,23 +7,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
+@Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-@Entity
-public class InventoryItem {
+@NoArgsConstructor
+public class ProductStock implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String size;
-    private int quantity;
+
+    @Enumerated(EnumType.STRING)
+    private ProductSize size;
+
+    private Integer quantity;
+
     @ManyToOne
     @JoinColumn(name = "product_id")
-    @JsonBackReference  // Prevents circular reference and avoids serialization of the back reference
+    @JsonBackReference
     private Product product;
-    public InventoryItem(String size, int quantity) {
-        this.size = size;
-        this.quantity = quantity;
-    }
 }

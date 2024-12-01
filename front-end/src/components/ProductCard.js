@@ -22,12 +22,12 @@ const ProductCard = ({ product }) => {
             {/* Text Content */}
             <CardContent sx={{ padding: 2 }}>
                 {/* Product Description */}
-                <Typography variant="body2" sx={{ fontSize: '14px', lineHeight: '1.4' }}>
+                <Typography sx={{ fontSize: '14px', fontFamily: 'roboto', fontWeight: '400' }}>
                     {product.description.length > 100 ? `${product.description.slice(0, 100)}...` : product.description}
                 </Typography>
 
                 {/* Price */}
-                <Typography variant="body2">
+                <Typography sx={{ fontSize: '14px', fontFamily: 'roboto', fontWeight: '400' }}>
                     {`€${product.price}`}
                 </Typography>
             </CardContent>
