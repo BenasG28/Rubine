@@ -1,5 +1,6 @@
 package com.rubine.product;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,8 @@ public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private ProductStockRepository productStockRepository;
 
     // Get all products
     public List<Product> getAllProducts() {
@@ -28,6 +31,15 @@ public class ProductService {
     }
     public Optional<Product> getProductById(Long id) {return productRepository.findById(id);}
 
+    //----------------------------------------------------------------------------------------------------
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+    public Product getProductWithStocks(Long productId) {
+        return productRepository.findByIdWithStocks(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+    }
+    //----------------------------------------------------------------------------------------------------
     // Update an existing product (PUT /products/update/{id})
     public Product updateProduct(Long id, Product updatedProduct) {
         Optional<Product> existingProductOptional = productRepository.findById(id);
@@ -44,6 +56,30 @@ public class ProductService {
             return productRepository.save(existingProduct); // Save the updated product
         } else {
             return null; // Return null or throw an exception if the product doesn't exist
+        }
+    }
+    // Add or update stock for a product and its size
+    public ProductStock updateProductStock(Long productId, ProductSize size, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+
+        // Check if stock already exists for this size
+        ProductStock existingStock = product.getProductStocks().stream()
+                .filter(stock -> stock.getSize() == size)
+                .findFirst()
+                .orElse(null);
+
+        if (existingStock != null) {
+            // Update stock quantity
+            existingStock.setQuantity(quantity);
+            return productStockRepository.save(existingStock);
+        } else {
+            // Create a new stock entry if not found
+            ProductStock newStock = new ProductStock();
+            newStock.setProduct(product);
+            newStock.setSize(size);
+            newStock.setQuantity(quantity);
+            return productStockRepository.save(newStock);
         }
     }
 }

@@ -22,23 +22,22 @@ const Navbar = () => {
                     {token && (
                         <>
                             <Button color="inherit" component={Link} to="/main">
-                            <Typography variant="h6" sx={{  fontSize: '22px' }}>
-                                Rubinė
+                            <Typography variant="h6" sx={{  fontSize: '22px', fontFamily: 'della respira' }}>
+                                Rūbinė
                             </Typography>
                             </Button>
 
                             {/* Admin Links (only visible for SYS_ADMIN or ADMIN roles) */}
                             {(roles.includes('SYS_ADMIN') || roles.includes('ADMIN')) && (
                                 <>
-                                    <Button color="inherit" component={Link} to="/users">Vartotojai</Button>
-                                    <Button color="inherit" component={Link} to="/products">Prekės</Button>
-                                    {/* Uncomment if you want reports */}
-                                     <Button color="inherit" component={Link} to="/reports">Ataskaitos</Button>
+                                    <Button color="inherit" component={Link} to="/users" sx={{  fontSize: '13px', fontFamily: 'roboto', fontWeight: '400' }}>Vartotojai</Button>
+                                    <Button color="inherit" component={Link} to="/products" sx={{  fontSize: '13px', fontFamily: 'roboto', fontWeight: '400' }}>Prekės</Button>
+                                    <Button color="inherit" component={Link} to="/reports" sx={{  fontSize: '13px', fontFamily: 'roboto', fontWeight: '400' }}>Ataskaitos</Button>
                                 </>
                             )}
 
                             {/* Common Link for Orders */}
-                            <Button color="inherit" component={Link} to="/orders">Užsakymai</Button>
+                            <Button color="inherit" component={Link} to="/orders" sx={{  fontSize: '13px', fontFamily: 'roboto', fontWeight: '400' }}>Užsakymai</Button>
 
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                 {token && (
@@ -51,7 +50,7 @@ const Navbar = () => {
                                     </>
                                 )}
                             </Box>
-                            <Button color="inherit" onClick={logout} sx={{ marginLeft: '22px' }}>Atsijungti</Button>
+                            <Button color="inherit" onClick={logout} sx={{  fontSize: '13px', fontFamily: 'roboto', fontWeight: '400' }}>Atsijungti</Button>
                         </>
                     )}
                 </Toolbar>

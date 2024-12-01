@@ -53,6 +53,7 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.PUT,"/products/update/{id}").hasAnyRole("SYS_ADMIN", "ADMIN");
                     auth.requestMatchers(HttpMethod.POST,"/products/create").hasAnyRole("SYS_ADMIN", "ADMIN");
                     auth.requestMatchers(HttpMethod.DELETE,"/products/delete/{id}").hasAnyRole("SYS_ADMIN", "ADMIN");
+                    auth.requestMatchers(HttpMethod.PUT,"/products/updateStock/{productId}").hasAnyRole("SYS_ADMIN", "ADMIN");
                     auth.requestMatchers("/products/all").permitAll();
                     auth.requestMatchers("/products/{id}").permitAll();
                     auth.requestMatchers("/main/**").permitAll();
