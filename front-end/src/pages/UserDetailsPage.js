@@ -178,7 +178,7 @@ const UserDetailsPage = () => {
                     <Controller
                         name="email"
                         control={control}
-                        render={({ field }) => (
+                        render={({ field     }) => (
                             <TextField
                                 {...field}
                                 label="El. paštas"
