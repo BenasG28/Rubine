@@ -8,6 +8,8 @@ import java.util.List;
 public interface OrderMapper {
     OrderDto toOrderDto(Order order);
 
+    List<OrderDto> toOrderDtoList(List<Order> orders);
+
     List<LineItemDto> toLineItemDtoList(List<LineItem> lineItemList);
 
     Order toOrder(OrderDto orderDto);

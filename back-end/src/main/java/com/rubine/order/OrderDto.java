@@ -1,5 +1,6 @@
 package com.rubine.order;
 
+import com.rubine.user.UserDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,4 +14,5 @@ public class OrderDto {
     private PaymentMethod paymentMethod;
     private List<LineItemDto> lineItems;
     private Double purchaseAmount;
+    private UserDto user;
 }

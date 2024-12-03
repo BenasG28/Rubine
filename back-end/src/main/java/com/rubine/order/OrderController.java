@@ -22,13 +22,13 @@ public class OrderController {
 
     // Get all orders
     @GetMapping("/all")
-    public ResponseEntity<List<Order>> getAllOrders() {
+    public ResponseEntity<List<OrderDto>> getAllOrders() {
         try {
             List<Order> orders = orderService.getAllOrders();  // Use service to get all orders
             if (orders.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);  // 204 No Content if no orders
             }
-            return new ResponseEntity<>(orders, HttpStatus.OK);  // 200 OK with list of orders
+            return new ResponseEntity<>(orderMapper.toOrderDtoList(orders), HttpStatus.OK);  // 200 OK with list of orders
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // 500 Internal Server Error
         }
