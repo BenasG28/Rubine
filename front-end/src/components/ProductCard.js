@@ -7,12 +7,16 @@ const ProductCard = ({ product }) => {
     const { token } = useAuth();
 
     return (
-        <CardActionArea component={Link} to={`/products/${product.id}`} sx={{ textDecoration: 'none', padding: 2 }}>
+        <CardActionArea
+            component={Link}
+            to={`/products/${product.id}`}
+            sx={{ textDecoration: 'none', padding: 2, maxWidth: 300 }}>
             {token && (
                 <>
             {/* Image */}
             <CardMedia
                 component="img"
+                width="300"
                 height="400"  // Increase the height for a larger image
                 image={product.imageUrl}
                 alt={product.name}

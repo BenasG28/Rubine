@@ -1,19 +1,23 @@
 package com.rubine.product;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ProductService {
 
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private ProductStockRepository productStockRepository;
+    private final ProductRepository productRepository;
+
+    private final ProductStockRepository productStockRepository;
+
+    public ProductService(ProductRepository productRepository, ProductStockRepository productStockRepository) {
+        this.productRepository = productRepository;
+        this.productStockRepository = productStockRepository;
+    }
 
     // Get all products
     public List<Product> getAllProducts() {
@@ -32,9 +36,6 @@ public class ProductService {
     public Optional<Product> getProductById(Long id) {return productRepository.findById(id);}
 
     //----------------------------------------------------------------------------------------------------
-    public ProductService(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
     public Product getProductWithStocks(Long productId) {
         return productRepository.findByIdWithStocks(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
@@ -81,5 +82,13 @@ public class ProductService {
             newStock.setQuantity(quantity);
             return productStockRepository.save(newStock);
         }
+    }
+
+    public List<Product> searchProducts(String query) {
+        if (query == null || query.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return productRepository.findBySearchQuery(query);
     }
 }

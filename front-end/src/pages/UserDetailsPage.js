@@ -259,7 +259,6 @@ const UserDetailsPage = () => {
                                 disabled={!isEditMode}
                                 error={!!errors.birthDate}
                                 helperText={errors.birthDate?.message}
-                                // TODO fix this deprecated shit
                                 slotProps={{inputLabel: {shrink: true} }}
                             />
                         )}

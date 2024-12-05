@@ -9,7 +9,7 @@ const BackButton = ({ to }) => {
     return (
         <Button
             variant="text"
-            color="primary"
+            color="black"
             onClick={() => navigate(to)}
             sx={{ marginBottom: 2, alignSelf: 'flex-start' }}
             startIcon={<ArrowBackIcon />}

@@ -56,7 +56,20 @@ const LoginPage = () => {
                     required
                     fullWidth
                 />
-                <Button type="submit" variant="contained" color="primary" fullWidth>Prisijungti</Button>
+                <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                        backgroundColor: 'black',
+                        '&:hover': { backgroundColor: '#333' },
+                        textTransform: 'none',
+                        padding: '12px',
+
+                    }}
+                    fullWidth
+                >
+                    Prisijungti
+                </Button>
             </form>
 
             <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
