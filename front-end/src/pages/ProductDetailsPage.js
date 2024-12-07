@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useAuth } from "../context/AuthContext";
 import ProductDetail from "../components/ProductDetail"; // Import the new component
 import { Box, CircularProgress, Typography } from '@mui/material';
+import BackButton from "../components/BackButton";
 
 const ProductDetailsPage = () => {
     const { productId } = useParams();
@@ -56,7 +57,11 @@ const ProductDetailsPage = () => {
         );
     }
 
-    return <ProductDetail product={product} />;
-};
+    return (
+        <Box sx={{ padding: 2 }}>
+            <BackButton to="/main" />
+            <ProductDetail product={product} />
+        </Box>
+    );};
 
 export default ProductDetailsPage;

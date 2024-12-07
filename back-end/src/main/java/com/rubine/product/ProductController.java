@@ -1,38 +1,40 @@
 package com.rubine.product;
 
-import com.rubine.user.User;
 import com.rubine.user.UserController;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.Id;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static org.hibernate.internal.CoreLogging.logger;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-    @Autowired
-    private ProductService productService;  // Inject the ProductService
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductService productService;  // Inject the ProductService
+    private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
+
+    public ProductController(ProductService productService, ProductRepository productRepository, ProductMapper productMapper) {
+        this.productService = productService;
+        this.productRepository = productRepository;
+        this.productMapper = productMapper;
+    }
 
     // Get all products
     @GetMapping("/all")
-    public ResponseEntity<List<Product>> getAllProducts() {
+    public ResponseEntity<List<ProductSearchResultDto>> getAllProducts() {
         try {
             List<Product> products = productService.getAllProducts();  // Use service to get all products
             if (products.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);  // 204 No Content if no products
             }
-            return new ResponseEntity<>(products, HttpStatus.OK);  // 200 OK with list of products
+            return new ResponseEntity<>(productMapper.toProductSearchResultDtoList(products), HttpStatus.OK);  // 200 OK with list of products
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // 500 Internal Server Error
         }
@@ -94,4 +96,14 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Return 404 Not Found with no body
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductSearchResultDto>> searchProducts(@RequestParam String query) {
+        List<Product> products = productService.searchProducts(query);
+        if (products.isEmpty()) {
+            products = Collections.emptyList();
+        }
+        return new ResponseEntity<>(productMapper.toProductSearchResultDtoList(products), HttpStatus.OK);
+    }
+
 }
