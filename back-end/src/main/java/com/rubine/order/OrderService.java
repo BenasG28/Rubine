@@ -30,6 +30,11 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
+    // Get all orders for a specific user
+    public List<Order> getOrdersByUserId(Long userId) {
+        return orderRepository.findByUserId(userId);
+    }
+
     // Get an order by ID
     public Optional<Order> getOrderById(Long id) {
         return orderRepository.findById(id);

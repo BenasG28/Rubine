@@ -34,6 +34,16 @@ public class OrderController {
         }
     }
 
+    // Fetch orders by user ID
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<OrderDto>> getOrdersByUserId(@PathVariable Long userId) {
+        List<Order> orders = orderService.getOrdersByUserId(userId);
+        if (orders.isEmpty()) {
+            return ResponseEntity.noContent().build(); // 204 No Content if no orders found
+        }
+        return ResponseEntity.ok(orderMapper.toOrderDtoList(orders)); // 200 OK with mapped orders
+    }
+
     // Get order by ID
     @GetMapping("/{id}")
     public ResponseEntity<Order> getOrderById(@PathVariable Long id) {

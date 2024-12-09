@@ -38,14 +38,27 @@ const MainPage = () => {
     }
 
     return (
-        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
-            {products.map((product) => (
-                <div key={product.id} style={{ margin: 10 }}>
-                    <ProductCard product={product} />
-                </div>
-            ))}
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+            {Array.isArray(products) && products.length > 0 ? (
+                products.map((product) => (
+                    <div key={product.id} style={{ margin: 10 }}>
+                        <ProductCard product={product} />
+                    </div>
+                ))
+            ) : (
+                <p style={{
+                    fontSize: '32px',
+                    fontWeight: 'bold',
+                    color: '#000',
+                    textAlign: 'center',
+                    fontFamily: 'Arial'
+                }}>
+                    Rubinė tuščia (╥﹏╥)
+                </p>
+            )}
         </div>
     );
+
 };
 
 export default MainPage;
