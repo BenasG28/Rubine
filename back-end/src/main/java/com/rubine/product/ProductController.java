@@ -1,10 +1,6 @@
 package com.rubine.product;
 
-import com.rubine.user.User;
-import com.rubine.user.UserController;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.Id;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,30 +8,37 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static org.hibernate.internal.CoreLogging.logger;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-    @Autowired
-    private ProductService productService;  // Inject the ProductService
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductService productService;
+    private final ProductStockService productStockService;
+    private final ProductRepository productRepository;
 
-    // Get all products
+    public ProductController(ProductService productService, ProductStockService productStockService, ProductRepository productRepository) {
+        this.productService = productService;
+        this.productStockService = productStockService;
+        this.productRepository = productRepository;
+    }
+
     @GetMapping("/all")
-    public ResponseEntity<List<Product>> getAllProducts() {
-        try {
-            List<Product> products = productService.getAllProducts();  // Use service to get all products
-            if (products.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);  // 204 No Content if no products
-            }
-            return new ResponseEntity<>(products, HttpStatus.OK);  // 200 OK with list of products
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // 500 Internal Server Error
-        }
+public ResponseEntity<List<Product>> getAllProducts() {
+    List<Product> products = productService.getAllProducts();
+    if (products.isEmpty()) {
+        return handleNoContent();  // Išorinė metodų apdorojimo logika
+    }
+    return handleSuccessfulResponse(products);  // Išorinė metodų apdorojimo logika
+}
+
+    private ResponseEntity<List<Product>> handleNoContent() {
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    private ResponseEntity<List<Product>> handleSuccessfulResponse(List<Product> products) {
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
     // Update product by ID
@@ -81,17 +84,18 @@ public class ProductController {
             @PathVariable Long productId,
             @RequestBody ProductStockRequest request) {
         try {
-            // Convert size to uppercase before parsing
-            ProductStock productStock = productService.updateProductStock(
-                    productId,
+            Product product = productService.getProductById(productId)
+                    .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+            ProductStock productStock = productStockService.updateProductStock(
+                    product,
                     ProductSize.valueOf(request.getSize().toUpperCase()),
                     request.getQuantity()
             );
             return ResponseEntity.ok(productStock);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // Return 400 Bad Request with no body
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // Grąžina 400 Bad Request
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Return 404 Not Found with no body
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Grąžina 404 Not Found
         }
     }
 }

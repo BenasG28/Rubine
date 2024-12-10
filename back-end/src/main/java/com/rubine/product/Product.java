@@ -33,4 +33,5 @@ public class Product implements Serializable {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference  // This side of the relationship is serialized
     private List<ProductStock> productStocks = new ArrayList<>();
+
 }

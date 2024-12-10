@@ -32,7 +32,6 @@ const Navbar = () => {
                                 <>
                                     <Button color="inherit" component={Link} to="/users" sx={{  fontSize: '13px', fontFamily: 'roboto', fontWeight: '400' }}>Vartotojai</Button>
                                     <Button color="inherit" component={Link} to="/products" sx={{  fontSize: '13px', fontFamily: 'roboto', fontWeight: '400' }}>Prekės</Button>
-                                    <Button color="inherit" component={Link} to="/reports" sx={{  fontSize: '13px', fontFamily: 'roboto', fontWeight: '400' }}>Ataskaitos</Button>
                                 </>
                             )}
 

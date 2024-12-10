@@ -3,7 +3,6 @@ import {
     Button,
     Container,
     Typography,
-    Paper,
     Box,
     Snackbar,
     CircularProgress,
@@ -86,31 +85,105 @@ const CartPage = () => {
 
     return (
         <Container maxWidth="lg" sx={{ mt: 4 }}>
-            <Typography variant="h4" gutterBottom>Krepšelis</Typography>
-            <Paper sx={{ p: 3 }}>
-                {cart && cart.items  && cart.items.length > 0 ? (
+            <Typography
+                sx={{
+                    marginBottom: 3,
+                    display: 'inline-block',
+                    fontFamily: 'roboto',
+                    fontSize: '32px',
+                    fontWeight: 400,
+                    height: '40px',
+                    textTransform: 'none',
+                    verticalAlign: 'middle',
+                    WebkitFontSmoothing: 'antialiased',
+                }}
+            >
+                Krepšelis
+            </Typography>
+
+                {cart?.items?.length > 0 ? (
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                        {cart.items.map(item => (
-                            <CartItem key={item.id} item={item} onRemove={handleRemoveItem} />
+                        {cart.items.map((item) => (
+                            <CartItem
+                                key={item.id}
+                                item={item}
+                                onRemove={handleRemoveItem}
+                            />
                         ))}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+                            <Typography variant="h6">Bendra suma: €{totalPrice.toFixed(2)}</Typography>
+                            <Box sx={{ display: 'flex', gap: 2 }}>
+                                <Button
+                                    variant="contained"
+                                    onClick={handleClearCart}
+                                    sx={{
+                                        fontFamily: 'roboto',
+                                        fontSize: '16px',
+                                        fontWeight: 300,
+                                        letterSpacing: '0.5px',
+                                        textTransform: 'none',
+                                        padding: '8px 16px',
+                                        borderRadius: '8px',
+                                        backgroundColor: '#DC143C',
+                                        color: '#fff',
+                                        boxShadow: 'none',
+                                        transition: 'background-color 0.3s ease, transform 0.3s ease',
+                                        '&:hover': {
+                                            backgroundColor: '#f4103b',
+                                            transform: 'scale(1.02)',
+                                        },
+                                        '&:active': {
+                                            backgroundColor: '#777',
+                                            transform: 'scale(1)',
+                                        },
+                                        '&:focus': {
+                                            outline: 'none',
+                                        },
+                                    }}
+                                >
+                                    Išvalyti krepšelį
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    onClick={() => setOpenDialog(true)}
+                                    sx={{
+                                        fontFamily: 'roboto',
+                                        fontSize: '16px',
+                                        fontWeight: 300,
+                                        letterSpacing: '0.5px',
+                                        textTransform: 'none',
+                                        padding: '8px 16px',
+                                        borderRadius: '8px',
+                                        backgroundColor: '#000',
+                                        color: '#fff',
+                                        boxShadow: 'none',
+                                        transition: 'background-color 0.3s ease, transform 0.3s ease',
+                                        '&:hover': {
+                                            backgroundColor: '#555',
+                                            transform: 'scale(1.02)',
+                                        },
+                                        '&:active': {
+                                            backgroundColor: '#777',
+                                            transform: 'scale(1)',
+                                        },
+                                        '&:focus': {
+                                            outline: 'none',
+                                        },
+                                    }}
+                                >
+                                    Pateikti užsakymą
+                                </Button>
+                            </Box>
+                        </Box>
                     </Box>
                 ) : (
-                    <Typography variant="h6">Jūsų krepšelis tuščias!</Typography>
+                    <Typography variant="h6" align="center">
+                        Jūsų krepšelis tuščias!
+                    </Typography>
                 )}
 
-                <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="h6">Bendra suma: €{totalPrice.toFixed(2)}</Typography>
-                    <Box>
-                        <Button variant="contained" color="secondary" onClick={handleClearCart} sx={{ mr: 2 }}>
-                            Išvalyti krepšelį
-                        </Button>
-                        <Button variant="contained" onClick={() => setOpenDialog(true)}>
-                            Pateikti užsakymą
-                        </Button>
-                    </Box>
-                </Box>
-            </Paper>
 
+            {/* Dialog for payment method */}
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
                 <DialogTitle>Pasirinkite apmokėjimo metodą</DialogTitle>
                 <DialogContent>
@@ -151,15 +224,15 @@ const CartPage = () => {
                 </DialogActions>
             </Dialog>
 
+            {/* Notification */}
             <Snackbar
                 open={notification.open}
                 autoHideDuration={6000}
                 onClose={() => setNotification({ ...notification, open: false })}
                 message={notification.message}
             />
-
         </Container>
     );
-};
+    };
 
 export default CartPage;
