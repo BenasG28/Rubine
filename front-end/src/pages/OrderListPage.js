@@ -25,7 +25,7 @@ import {
 } from '@mui/material';
 
 const OrderListPage = () => {
-    const { isAuthenticated, roles, token } = useAuth(); // Use token and roles from AuthContext
+    const { isAuthenticated, roles, token, user } = useAuth(); // Use token and roles from AuthContext
     const [orders, setOrders] = useState([]);
     const [open, setOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
@@ -45,15 +45,21 @@ const OrderListPage = () => {
                 .then(response => setOrders(response.data))
                 .catch(error => console.error("Error fetching orders:", error));
         }
-    }, [isAuthenticated, roles, token]);
+
+        if (isAuthenticated && (roles.includes('USER'))) {
+            axios.get(`/orders/user/${user.id}`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+            })
+                .then(response => setOrders(response.data))
+                .catch(error => console.error("Error fetching orders:", error));
+        }
+
+    }, [isAuthenticated, roles, token, user]);
 
     if (!isAuthenticated) {
         return <Navigate to={"/login"} replace />;
     }
 
-    if (!roles.includes('ADMIN') && !roles.includes('SYS_ADMIN')) {
-        return <Navigate to={"/"} replace />;
-    }
 
     const handleCreateOrder = () => {
         const formattedOrder = {
