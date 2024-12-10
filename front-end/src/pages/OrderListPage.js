@@ -3,12 +3,29 @@ import { useAuth } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
 import axios from 'axios';
 import {
-    Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead,
-    TableRow, Paper, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Box, MenuItem, Select
+    Button,
+    Typography,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    Box,
+    MenuItem,
+    Select,
+    FormControl,
+    InputLabel
 } from '@mui/material';
-// TODO Make radio buttons for statuses
+
 const OrderListPage = () => {
-    const { isAuthenticated, token } = useAuth(); // Use token from AuthContext
+    const { isAuthenticated, roles, token } = useAuth(); // Use token and roles from AuthContext
     const [orders, setOrders] = useState([]);
     const [open, setOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
@@ -21,12 +38,22 @@ const OrderListPage = () => {
     });
 
     useEffect(() => {
-        axios.get("/orders/all", {
-            headers: { 'Authorization': `Bearer ${token}` },
-        })
-            .then(response => setOrders(response.data))
-            .catch(error => console.error("Error fetching orders:", error));
-    }, [token]);
+        if (isAuthenticated && (roles.includes('ADMIN') || roles.includes('SYS_ADMIN'))) {
+            axios.get("/orders/all", {
+                headers: { 'Authorization': `Bearer ${token}` },
+            })
+                .then(response => setOrders(response.data))
+                .catch(error => console.error("Error fetching orders:", error));
+        }
+    }, [isAuthenticated, roles, token]);
+
+    if (!isAuthenticated) {
+        return <Navigate to={"/login"} replace />;
+    }
+
+    if (!roles.includes('ADMIN') && !roles.includes('SYS_ADMIN')) {
+        return <Navigate to={"/"} replace />;
+    }
 
     const handleCreateOrder = () => {
         const formattedOrder = {
@@ -34,12 +61,11 @@ const OrderListPage = () => {
             user: { id: newOrder.user }, // Wrap user ID in an object with 'id' key
         };
 
-
         axios.post('/orders/create', formattedOrder, {
             headers: { 'Authorization': `Bearer ${token}` },
         })
             .then(response => {
-                setOrders([...orders, response.data]);  // Add new order to the list
+                setOrders([...orders, response.data]); // Add new order to the list
                 setNewOrder({ dateCreated: '', purchaseAmount: '', status: '', user: '' });
                 handleClose();
             })
@@ -150,11 +176,11 @@ const OrderListPage = () => {
                     <TableHead>
                         <TableRow>
                             <TableCell>ID</TableCell>
-                            <TableCell>Date Created</TableCell>
-                            <TableCell>Purchase Amount</TableCell>
-                            <TableCell>Status</TableCell>
-                            <TableCell>User</TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell>Data</TableCell>
+                            <TableCell>Kaina</TableCell>
+                            <TableCell>Statusas</TableCell>
+                            <TableCell>Vartotojo ID</TableCell>
+                            <TableCell>Funkcijos</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -167,15 +193,15 @@ const OrderListPage = () => {
                                     <TableCell>{order.status}</TableCell>
                                     <TableCell>{order.user.id || order.user.name}</TableCell>
                                     <TableCell>
-                                        <Button size="small" onClick={() => handleEditOpen(order)}>Edit</Button>
-                                        <Button size="small" color="error" onClick={() => handleDeleteOrder(order.id)}>Delete</Button>
+                                        <Button size="small" onClick={() => handleEditOpen(order)}>Atnaujinti</Button>
+                                        <Button size="small" color="error" onClick={() => handleDeleteOrder(order.id)}>Ištrinti</Button>
                                     </TableCell>
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={6} align="center">
-                                    No orders available
+                                    Nėra užsakymų
                                 </TableCell>
                             </TableRow>
                         )}
@@ -185,12 +211,12 @@ const OrderListPage = () => {
 
             {/* Dialog for order creation */}
             <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Add New Order</DialogTitle>
+                <DialogTitle>Naujas užsakymas</DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
                         margin="dense"
-                        label="Date Created"
+                        label="Data"
                         type="date"
                         fullWidth
                         value={newOrder.dateCreated}
@@ -199,7 +225,7 @@ const OrderListPage = () => {
                     />
                     <TextField
                         margin="dense"
-                        label="Purchase Amount"
+                        label="Kaina"
                         type="number"
                         fullWidth
                         value={newOrder.purchaseAmount}
@@ -207,37 +233,40 @@ const OrderListPage = () => {
                     />
                     <TextField
                         margin="dense"
-                        label="User ID"
+                        label="Vartotojo ID"
                         type="text"
                         fullWidth
                         value={newOrder.user}
                         onChange={(e) => setNewOrder({ ...newOrder, user: e.target.value })}
                     />
-                    <Select
-                        fullWidth
-                        value={newOrder.status}
-                        onChange={(e) => setNewOrder({ ...newOrder, status: e.target.value })}
-                        variant="outlined"
-                        margin="dense"
-                    >
-                        <MenuItem value="PENDING">Pending</MenuItem>
-                        <MenuItem value="COMPLETED">Completed</MenuItem>
-                    </Select>
+                    <FormControl fullWidth variant="outlined" margin="dense">
+                        <InputLabel>Statusas</InputLabel>
+                        <Select
+                            value={newOrder.status}
+                            onChange={(e) => setNewOrder({ ...newOrder, status: e.target.value })}
+                            label="Statusas" // Make sure the label is linked with the Select component
+                        >
+                            <MenuItem value="PENDING">Pending</MenuItem>
+                            <MenuItem value="COMPLETED">Completed</MenuItem>
+                            <MenuItem value="CANCELLED">Canceled</MenuItem>
+                            <MenuItem value="SHIPPED">Shipped</MenuItem>
+                        </Select>
+                    </FormControl>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="secondary">Cancel</Button>
-                    <Button onClick={handleCreateOrder} color="primary">Create</Button>
+                    <Button onClick={handleClose} color="secondary">Atšaukti</Button>
+                    <Button onClick={handleCreateOrder} color="primary">Atnaujinti</Button>
                 </DialogActions>
             </Dialog>
 
             {/* Dialog for editing an order */}
             <Dialog open={editOpen} onClose={handleEditClose}>
-                <DialogTitle>Edit Order</DialogTitle>
+                <DialogTitle>Atnaujinti užsakymą</DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
                         margin="dense"
-                        label="Date Created"
+                        label="Data"
                         type="date"
                         fullWidth
                         value={editOrder?.dateCreated || ""}
@@ -245,7 +274,7 @@ const OrderListPage = () => {
                     />
                     <TextField
                         margin="dense"
-                        label="Purchase Amount"
+                        label="Kaina"
                         type="number"
                         fullWidth
                         value={editOrder?.purchaseAmount || ""}
@@ -253,26 +282,29 @@ const OrderListPage = () => {
                     />
                     <TextField
                         margin="dense"
-                        label="User ID"
+                        label="Vartotojo ID"
                         type="text"
                         fullWidth
                         value={editOrder?.user || ""}
                         onChange={(e) => setEditOrder({ ...editOrder, user: e.target.value })}
                     />
-                    <Select
-                        fullWidth
-                        value={editOrder?.status || ""}
-                        onChange={(e) => setEditOrder({ ...editOrder, status: e.target.value })}
-                        variant="outlined"
-                        margin="dense"
-                    >
-                        <MenuItem value="PENDING">Pending</MenuItem>
-                        <MenuItem value="COMPLETED">Completed</MenuItem>
-                    </Select>
+                    <FormControl fullWidth variant="outlined" margin="dense">
+                        <InputLabel>Statusas</InputLabel>
+                        <Select
+                            value={newOrder.status}
+                            onChange={(e) => setNewOrder({ ...newOrder, status: e.target.value })}
+                            label="Statusas" // Make sure the label is linked with the Select component
+                        >
+                            <MenuItem value="PENDING">Pending</MenuItem>
+                            <MenuItem value="COMPLETED">Completed</MenuItem>
+                            <MenuItem value="CANCELLED">Canceled</MenuItem>
+                            <MenuItem value="SHIPPED">Shipped</MenuItem>
+                        </Select>
+                    </FormControl>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleEditClose} color="secondary">Cancel</Button>
-                    <Button onClick={handleEditOrder} color="primary">Update</Button>
+                    <Button onClick={handleEditClose} color="secondary">Atšaukti</Button>
+                    <Button onClick={handleEditOrder} color="primary">Atnaujinti</Button>
                 </DialogActions>
             </Dialog>
         </Box>
