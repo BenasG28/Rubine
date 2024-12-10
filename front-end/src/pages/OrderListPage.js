@@ -3,9 +3,17 @@ import { useAuth } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
 import axios from 'axios';
 import {
-    Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead,
-    TableRow, Paper, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Box, MenuItem, Select
+    Button, Table, TableBody, TableCell, TableHead,
+    TableRow, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Box, MenuItem, Select, Stack, IconButton
 } from '@mui/material';
+import AddButton from "../components/Buttons/AddButton";
+import ReportDownloadDialog from "../components/ReportDownloadDialog";
+import ListHeading from "../components/ListHeading";
+import StartingBox from "../components/StartingBox";
+import DeclineButton from "../components/Buttons/DeclineButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import TableBox from "../components/TableBox";
 // TODO Make radio buttons for statuses
 const OrderListPage = () => {
     const { isAuthenticated, token } = useAuth(); // Use token from AuthContext
@@ -13,11 +21,17 @@ const OrderListPage = () => {
     const [open, setOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
     const [editOrder, setEditOrder] = useState(null);
+    // report dialog
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+    const [allData, setAllData] = useState(false);
+    const [productType, setProductType] = useState("");
     const [newOrder, setNewOrder] = useState({
         dateCreated: '',
         purchaseAmount: '',
         status: '',
-        user: '', // Assuming each order is associated with a user ID
+        user: '',
     });
 
     useEffect(() => {
@@ -31,7 +45,7 @@ const OrderListPage = () => {
     const handleCreateOrder = () => {
         const formattedOrder = {
             ...newOrder,
-            user: { id: newOrder.user }, // Wrap user ID in an object with 'id' key
+            user: { id: newOrder.user },
         };
 
 
@@ -81,94 +95,51 @@ const OrderListPage = () => {
     };
     const handleEditClose = () => setEditOpen(false);
 
+    const handleReportOpenDialog = () => setDialogOpen(true);
+    const handleReportCloseDialog = () => setDialogOpen(false);
+
     if (!isAuthenticated) {
         return <Navigate to={"/login"} replace />;
     }
 
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                justifyContent: 'flex-start',
-                minHeight: '100vh',
-                padding: 2,
-            }}
-        >
+       <StartingBox>
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography
-                    variant="h5"
-                    sx={{
-                        marginBottom: 3,
-                        display: 'inline-block',
-                        fontFamily: 'Montserrat, Arial, sans-serif',
-                        fontSize: '32px',
-                        fontWeight: 600,
-                        height: '40px',
-                        textTransform: 'none',
-                        verticalAlign: 'middle',
-                        WebkitFontSmoothing: 'antialiased', // To apply webkit smoothing
-                    }}
-                >
-                    Užsakymų sąrašas
-                </Typography>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleClickOpen}
-                    sx={{
-                        marginBottom: 3,
-                        fontFamily: 'Montserrat, Arial, sans-serif', // Match the font family
-                        fontSize: '16px', // Adjust font size for readability
-                        fontWeight: 300, // Semi-bold text for a stronger appearance
-                        letterSpacing: '0.5px', // Slight spacing for better readability
-                        textTransform: 'none', // Remove automatic uppercase
-                        padding: '10px 20px', // Adjust padding for a larger, more clickable area
-                        borderRadius: '8px', // Rounded corners for a modern look
-                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Subtle shadow for depth
-                        transition: 'background-color 0.3s ease, transform 0.3s ease', // Smooth transition for hover effect
-                        '&:hover': {
-                            backgroundColor: 'primary.dark',
-                            transform: 'scale(1.05)',
-                        },
-                        '&:active': {
-                            backgroundColor: 'primary.main',
-                            transform: 'scale(1)',
-                        },
-                        '&:focus': {
-                            outline: 'none',
-                        },
-                    }}
-                >
-                NAUJAS UŽSAKYMAS
-                </Button>
+               <ListHeading>Užsakymų sąrašas</ListHeading>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                    <AddButton onClick={handleReportOpenDialog}>ATSISIŲSKIT ATASKAITĄ</AddButton>
+                    <AddButton onClick={handleClickOpen}>NAUJAS UŽSAKYMAS</AddButton>
+                </Box>
             </Box>
 
-            <TableContainer component={Paper}>
-                <Table>
+            <TableBox>
+                <Table sx={{ minWidth: '1200px' }}>
                     <TableHead>
                         <TableRow>
-                            <TableCell>ID</TableCell>
-                            <TableCell>Date Created</TableCell>
-                            <TableCell>Purchase Amount</TableCell>
-                            <TableCell>Status</TableCell>
-                            <TableCell>User</TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell>Sukūrimo data</TableCell>
+                            <TableCell>Suma</TableCell>
+                            <TableCell>Statusas</TableCell>
+                            <TableCell>Vartotojas</TableCell>
+                            <TableCell>Veiksmai</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {orders.length > 0 ? (
                             orders.map((order) => (
                                 <TableRow key={order.id}>
-                                    <TableCell>{order.id}</TableCell>
                                     <TableCell>{order.dateCreated}</TableCell>
                                     <TableCell>{order.purchaseAmount}</TableCell>
                                     <TableCell>{order.status}</TableCell>
                                     <TableCell>{order.user.id || order.user.name}</TableCell>
                                     <TableCell>
-                                        <Button size="small" onClick={() => handleEditOpen(order)}>Edit</Button>
-                                        <Button size="small" color="error" onClick={() => handleDeleteOrder(order.id)}>Delete</Button>
+                                        <Stack direction="row" >
+                                            <IconButton onClick={() => handleEditOpen(order)} sx={{ color: '#000', fontWeight: '300' }}>
+                                                <EditIcon />
+                                            </IconButton>
+                                            <IconButton onClick={() => handleDeleteOrder(order.id)} sx={{ color: '#DC143C' }}>
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </Stack>
                                     </TableCell>
                                 </TableRow>
                             ))
@@ -181,8 +152,7 @@ const OrderListPage = () => {
                         )}
                     </TableBody>
                 </Table>
-            </TableContainer>
-
+                </TableBox>
             {/* Dialog for order creation */}
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Add New Order</DialogTitle>
@@ -229,7 +199,20 @@ const OrderListPage = () => {
                     <Button onClick={handleCreateOrder} color="primary">Create</Button>
                 </DialogActions>
             </Dialog>
-
+            {/* Dialog for report */}
+            <ReportDownloadDialog
+                open={dialogOpen}
+                onClose={handleReportCloseDialog}
+                reportType="order"
+                startDate={startDate}
+                endDate={endDate}
+                allData={allData}
+                productType={productType}
+                setStartDate={setStartDate}
+                setEndDate={setEndDate}
+                setProductType={setProductType}
+                setAllData={setAllData}
+            />
             {/* Dialog for editing an order */}
             <Dialog open={editOpen} onClose={handleEditClose}>
                 <DialogTitle>Edit Order</DialogTitle>
@@ -266,16 +249,16 @@ const OrderListPage = () => {
                         variant="outlined"
                         margin="dense"
                     >
-                        <MenuItem value="PENDING">Pending</MenuItem>
-                        <MenuItem value="COMPLETED">Completed</MenuItem>
+                        <MenuItem value="PENDING">Ruošiama</MenuItem>
+                        <MenuItem value="COMPLETED">Paruoštas</MenuItem>
                     </Select>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleEditClose} color="secondary">Cancel</Button>
-                    <Button onClick={handleEditOrder} color="primary">Update</Button>
+                    <DeclineButton onClick={handleEditClose}></DeclineButton>
+                    <Button onClick={handleEditOrder} color="primary">Atnaujinti</Button>
                 </DialogActions>
             </Dialog>
-        </Box>
+       </StartingBox>
     );
 };
 

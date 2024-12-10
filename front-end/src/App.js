@@ -31,6 +31,15 @@ function App() {
                             ))}
                             <Route path="/" element={<Navigate to="/main" replace />} />
                             <Route path="/unauthorized" element={<Unauthorized/>} />
+                            <Route path="/main" element={<ProtectedRoute component={MainPage} />} />
+                            <Route path="/users" element={<ProtectedRoute component={UserListPage} />} />
+                            <Route path="/products" element={<ProtectedRoute component={ProductListPage} />} />
+                            <Route path="/orders" element={<ProtectedRoute component={OrderListPage} />} />
+                            <Route path="/products/:productId" element={<ProtectedRoute component={ProductDetailsPage} />} />
+                            <Route path="/reports" element={<ProtectedRoute component={ReportListPage} />} />
+                            <Route path="/cart" element={<ProtectedRoute component={CartPage}/>} />
+                            <Route path="/profile" element={<ProtectedRoute component={ProfilePage} />} />
+                            <Route path="/" element={<Navigate to="/login" replace />} />
                         </Routes>
 
                     </ThemeProvider>

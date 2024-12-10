@@ -2,6 +2,7 @@ package com.rubine.report;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,66 +14,79 @@ import java.time.LocalDate;
 @RequestMapping("/reports")
 public class ReportController {
 
-    private final ExcelReportService excelReportService;
-
+    private final UserReportGenerator userReportGenerator;
+    private final ProductReportGenerator productReportGenerator;
+    private final OrderReportGenerator orderReportGenerator;
 
     private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
+    private static final String CONTENT_DISPOSITION = "Content-Disposition";
 
-    public ReportController(ExcelReportService excelReportService) {
-        this.excelReportService = excelReportService;
+    public ReportController(UserReportGenerator userReportGenerator,
+                            ProductReportGenerator productReportGenerator,
+                            OrderReportGenerator orderReportGenerator) {
+        this.userReportGenerator = userReportGenerator;
+        this.productReportGenerator = productReportGenerator;
+        this.orderReportGenerator = orderReportGenerator;
     }
 
-    //TODO Implement difference in data retrieval for SYS_ADMIN and ADMIN (password, other sensitive info).
+    // Bendras metodas, kad išvengti kodo dubliavimo
+    private ResponseEntity<byte[]> generateReport(
+            ReportType reportType,
+            Object... params) {
+        try {
+            byte[] report = switch (reportType) {
+                case USER -> userReportGenerator.generateUserExcelReport((LocalDate) params[0], (LocalDate) params[1]);
+                case PRODUCT -> productReportGenerator.generateProductExcelReport((String) params[0]);
+                case ORDER -> orderReportGenerator.generateOrderExcelReport((String) params[0], (String) params[1]);
+            };
+            return ResponseEntity.ok()
+                    .header(CONTENT_DISPOSITION, "attachment; filename=" + reportType.getFileName() + ".xlsx")
+                    .body(report);
+        } catch (IOException e) {
+            logger.error("Error generating report for " + reportType, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     @GetMapping("/user")
     public ResponseEntity<byte[]> getUserReport(
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate) {
         try {
-            byte[] report;
-            if (startDate == null || endDate == null) {
-                // If no date range is provided, fetch all users
-                report = excelReportService.generateUserExcelReport(null, null);
-            } else {
-                // Fetch users within the date range
-                report = excelReportService.generateUserExcelReport(startDate, endDate);
-            }
+            byte[] report = userReportGenerator.generateUserExcelReport(startDate, endDate);
             return ResponseEntity.ok()
-                    .header("Content-Disposition", "attachment; filename=users_report.xlsx")
+                    .header(CONTENT_DISPOSITION, "attachment; filename=user_report.xlsx")
                     .body(report);
         } catch (IOException e) {
-            return ResponseEntity.status(500).body(null);
+            logger.error("Error generating user report", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @GetMapping("/product")
-    public ResponseEntity<byte[]> getProductReport(
-            @RequestParam(required = false) String productType) {
+    public ResponseEntity<byte[]> getProductReport(@RequestParam(required = false) String productType) {
         try {
-            byte[] report = excelReportService.generateProductExcelReport(productType);
+            byte[] report = productReportGenerator.generateProductExcelReport(productType);
             return ResponseEntity.ok()
-                    .header("Content-Disposition", "attachment; filename=products_report.xlsx")
+                    .header(CONTENT_DISPOSITION, "attachment; filename=product_report.xlsx")
                     .body(report);
         } catch (IOException e) {
             logger.error("Error generating product report", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @GetMapping("/order")
-    public ResponseEntity<byte[]> getOrderReport(
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate) {
+    public ResponseEntity<byte[]> getOrderReport(@RequestParam(required = false) String startDate,
+                                                 @RequestParam(required = false) String endDate) {
         try {
-            byte[] report = excelReportService.generateOrderExcelReport(startDate, endDate);
+            byte[] report = orderReportGenerator.generateOrderExcelReport(startDate, endDate);
             return ResponseEntity.ok()
-                    .header("Content-Disposition", "attachment; filename=orders_report.xlsx")
+                    .header(CONTENT_DISPOSITION, "attachment; filename=order_report.xlsx")
                     .body(report);
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            logger.error("Error generating order report", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
-
-
 }

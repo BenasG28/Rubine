@@ -1,6 +1,6 @@
 import { useAuth } from "../context/AuthContext";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
     Box,
@@ -15,7 +15,7 @@ import userValidationSchema from "../validation/userValidationSchema";
 
 const ProfilePage = () => {
     const { user } = useAuth(); // Assuming useAuth provides logged-in user info
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [isEditMode, setIsEditMode] = useState(false);
 
     const { control, handleSubmit, reset, formState: { errors } } = useForm({

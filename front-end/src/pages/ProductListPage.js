@@ -3,7 +3,6 @@ import { useAuth } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
 import axios from 'axios';
 import {
-    Button,
     Typography,
     Table,
     TableBody,
@@ -22,7 +21,13 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from '@mui/icons-material/Edit';
 import InfoIcon from '@mui/icons-material/Info';
-
+import DeclineButton from "../components/Buttons/DeclineButton";
+import AcceptButton from "../components/Buttons/AcceptButton";
+import AddButton from "../components/Buttons/AddButton";
+import ListHeading from "../components/ListHeading";
+import StartingBox from "../components/StartingBox";
+import ReportDownloadDialog from "../components/ReportDownloadDialog";
+import TableBox from "../components/TableBox";
 
 const ProductListPage = () => {
     const { isAuthenticated } = useAuth();
@@ -31,6 +36,13 @@ const ProductListPage = () => {
     const [editOpen, setEditOpen] = useState(false);
     const [editProduct, setEditProduct] = useState(null);
     const token = localStorage.getItem('token');
+    // report dialog
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+    const [allData, setAllData] = useState(false);
+    const [productType, setProductType] = useState("");
+
     const [newProduct, setNewProduct] = useState({
         brand: '',
         color: '',
@@ -46,7 +58,6 @@ const ProductListPage = () => {
         size: '',
         stock: '',
     });
-
 
     useEffect(() => {
         axios.get("/products/all", {
@@ -109,35 +120,7 @@ const ProductListPage = () => {
             })
             .catch(error => console.error("Error deleting product:", error));
     };
-    //
-    // const handleUpdateProductDetails = () => {
-    //     if (!selectedProduct?.id) return;
-    //
-    //     const updatedProduct = {
-    //         ...selectedProduct,
-    //         size: editProductDetails.size,
-    //         stock: editProductDetails.stock,
-    //     };
-    //
-    //     axios.put(`/products/updateStock/${selectedProduct.id}?size=${updatedProduct.size}&quantity=${updatedProduct.stock}`, updatedProduct, {
-    //         headers: { 'Authorization': `Bearer ${token}` },
-    //     })
-    //         .then((response) => {
-    //             // Merge updated product with the existing products list
-    //             setProducts((prevProducts) =>
-    //                 prevProducts.map((product) =>
-    //                     product.id === selectedProduct.id ? { ...product, ...response.data } : product
-    //                 )
-    //             );
-    //             handleDetailsClose(); // Close the modal
-    //         })
-    //         .catch((error) => {
-    //             console.error("Error updating product details:", error);
-    //             if (error.response) {
-    //                 console.error("Response error:", error.response.data);
-    //             }
-    //         });
-    // };
+
     const handleUpdateProductDetails = () => {
         if (!selectedProduct?.id) return;
 
@@ -209,73 +192,26 @@ const ProductListPage = () => {
         setSelectedProduct(null);
     };
 
+    const handleReportOpenDialog = () => setDialogOpen(true);
+    const handleReportCloseDialog = () => setDialogOpen(false);
+
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                justifyContent: 'flex-start',
-                minHeight: '100vh',
-                padding: 2,
-            }}
-        >
+        <StartingBox>
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography
-                    sx={{
-                        marginBottom: 3,
-                        display: 'inline-block',
-                        fontFamily: 'roboto',
-                        fontSize: '32px',
-                        fontWeight: 400,
-                        height: '40px',
-                        textTransform: 'none',
-                        verticalAlign: 'middle',
-                        WebkitFontSmoothing: 'antialiased', // To apply webkit smoothing
-                    }}
-                >
-                    Produktų sąrašas
-                </Typography>
-                <Button
-                    variant="contained"
-                    onClick={handleClickOpen}
-                    sx={{
-                        marginBottom: 3,
-                        fontFamily: 'roboto',
-                        fontSize: '16px',
-                        fontWeight: 300,
-                        letterSpacing: '0.5px',
-                        textTransform: 'none',
-                        padding: '8px 16px', // Smaller padding for a more compact size
-                        borderRadius: '8px',
-                        backgroundColor: '#000',
-                        color: '#fff',
-                        boxShadow: 'none', // Remove extra shadow for simplicity
-                        transition: 'background-color 0.3s ease, transform 0.3s ease',
-                        '&:hover': {
-                            backgroundColor: '#555', // Dark grey on hover
-                            transform: 'scale(1.02)', // Slightly larger on hover
-                        },
-                        '&:active': {
-                            backgroundColor: '#777', // Lighter grey when active
-                            transform: 'scale(1)', // Normal scale when active
-                        },
-                        '&:focus': {
-                            outline: 'none',
-                        },
-                    }}
-                >
-                    NAUJAS PRODUKTAS
-                </Button>
+               <ListHeading>Produktų sąrašas</ListHeading>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                    <AddButton onClick={handleReportOpenDialog}>ATSISIŲSKIT ATASKAITĄ</AddButton>
+                    <AddButton onClick={handleClickOpen}>NAUJAS PRODUKTAS</AddButton>
+                </Box>
             </Box>
-                <Table sx={{ width: '100%', tableLayout: 'auto', overflowX: 'auto', display: 'block' }}>
+
+            <TableBox>
+                <Table sx={{ minWidth: '1200px' }}>
                     <TableHead>
                         <TableRow>
-                            <TableCell>ID</TableCell>
                             <TableCell>Produkto prekinis ženklas</TableCell>
                             <TableCell>Spalva</TableCell>
                             <TableCell>Aprašymas</TableCell>
-                            <TableCell>Nuotraukos URL</TableCell>
                             <TableCell>Kaina</TableCell>
                             <TableCell>Produkto tipas</TableCell>
                             <TableCell>Sandėlio kiekis ir Dydis</TableCell> {/* New column for stock and size */}
@@ -286,26 +222,16 @@ const ProductListPage = () => {
                         {products.length > 0 ? (
                             products.map((product) => (
                                 <TableRow key={product.id}>
-                                    <TableCell>{product.id}</TableCell>
                                     <TableCell>{product.brand}</TableCell>
                                     <TableCell>{product.color}</TableCell>
                                     <TableCell>{product.description}</TableCell>
-                                    <TableCell
-                                        sx={{
-                                            wordBreak: 'break-word',   // Allow word wrapping for long text (URLs)
-                                            overflow: 'hidden',        // Hide any overflow
-                                            textOverflow: 'ellipsis',  // Optionally add ellipsis for overflowed text
-                                            whiteSpace: 'normal',      // Allow text to wrap
-                                            padding: '8px',            // Adjust padding for a compact look
-                                        }}
-                                    >
-                                        {product.imageUrl}
-                                    </TableCell>
                                     <TableCell>{product.price}</TableCell>
                                     <TableCell>{product.productType}</TableCell>
                                     <TableCell>
                                         {product.productStocks.map(stock => (
-                                            <Typography key={stock.id}>
+                                            <Typography key={stock.id} sx={{    fontSize: '15px',
+                                                fontFamily: 'Roboto',
+                                                fontWeight: 300,}}>
                                                 {`Dydis: ${stock.size}, Kiekis: ${stock.quantity}`}
                                             </Typography>
                                         ))}
@@ -327,13 +253,14 @@ const ProductListPage = () => {
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={8} align="center">
+                                <TableCell colSpan={7} align="center">
                                     Nėra produktų sąraše
                                 </TableCell>
                             </TableRow>
                         )}
                     </TableBody>
                 </Table>
+            </TableBox>
 
 
             {/* Dialog for viewing product details */}
@@ -366,8 +293,8 @@ const ProductListPage = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleDetailsClose} sx={{ color: '#DC143C' }}>Uždaryti</Button>
-                    <Button onClick={handleUpdateProductDetails} sx={{ color: '#000' }}>Išsaugoti</Button>
+                    <DeclineButton onClick={handleDetailsClose}></DeclineButton>
+                    <AcceptButton onClick={handleUpdateProductDetails}>Išsaugoti</AcceptButton>
                 </DialogActions>
             </Dialog>
 
@@ -427,10 +354,25 @@ const ProductListPage = () => {
                     </RadioGroup>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} sx={{ color: '#DC143C'}}>Atšaukti</Button>
-                    <Button onClick={handleCreateProduct} sx={{ color: '#000'}}>Sukurti</Button>
+                    <DeclineButton onClick={handleClose}></DeclineButton>
+                    <AcceptButton onClick={handleCreateProduct}>Sukurti</AcceptButton>
                 </DialogActions>
             </Dialog>
+
+            {/* Dialog for report */}
+            <ReportDownloadDialog
+                open={dialogOpen}
+                onClose={handleReportCloseDialog}
+                reportType="product"
+                startDate={startDate}
+                endDate={endDate}
+                allData={allData}
+                productType={productType}
+                setStartDate={setStartDate}
+                setEndDate={setEndDate}
+                setProductType={setProductType}
+                setAllData={setAllData}
+            />
 
             {/* Dialog for editing a product */}
             <Dialog open={editOpen} onClose={handleEditClose}>
@@ -487,23 +429,11 @@ const ProductListPage = () => {
                     </RadioGroup>
                 </DialogContent>
                 <DialogActions>
-                    <Button
-                        onClick={handleEditClose}
-                        sx={{
-                                fontFamily: 'roboto',
-                                color: '#DC143C',
-                            }}
-
-                    >Atšaukti</Button>
-                    <Button
-                        onClick={handleEditProduct}  sx={{
-                        fontFamily: 'roboto',
-                        color: '#000',
-                    }}
-                    >Atnaujinti</Button>
+                    <DeclineButton onClick={handleEditClose}></DeclineButton>
+                    <AcceptButton onClick={handleEditProduct}>Atnaujinti</AcceptButton>
                 </DialogActions>
             </Dialog>
-        </Box>
+        </StartingBox>
     );
 };
 export default ProductListPage;
