@@ -1,6 +1,5 @@
 package com.rubine.product;
 
-import com.rubine.user.UserController;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +19,13 @@ public class ProductController {
     private final ProductService productService;
     private final ProductStockService productStockService;
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
-    public ProductController(ProductService productService, ProductStockService productStockService, ProductRepository productRepository) {
+    public ProductController(ProductService productService, ProductStockService productStockService, ProductRepository productRepository, ProductMapper productMapper) {
         this.productService = productService;
         this.productStockService = productStockService;
         this.productRepository = productRepository;
+        this.productMapper = productMapper;
     }
 
     @GetMapping("/all")

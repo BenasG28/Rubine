@@ -224,6 +224,7 @@ const OrderListPage = () => {
                         type="date"
                         fullWidth
                         value={editOrder?.dateCreated || ""}
+                        slotProps={{inputLabel: {shrink: true} }}
                         onChange={(e) => setEditOrder({ ...editOrder, dateCreated: e.target.value })}
                     />
                     <TextField
@@ -239,7 +240,7 @@ const OrderListPage = () => {
                         label="User ID"
                         type="text"
                         fullWidth
-                        value={editOrder?.user || ""}
+                        value={editOrder?.user.id || ""}
                         onChange={(e) => setEditOrder({ ...editOrder, user: e.target.value })}
                     />
                     <Select

@@ -9,6 +9,13 @@ import axios from "axios";
 import {CartProvider} from "./context/CartContext";
 import routeConfig from "./config/routeConfig";
 import Unauthorized from "./components/Unauthorized";
+import MainPage from "./pages/MainPage";
+import UserListPage from "./pages/UserListPage";
+import ProductListPage from "./pages/ProductListPage";
+import OrderListPage from "./pages/OrderListPage";
+import ProductDetailsPage from "./pages/ProductDetailsPage";
+import CartPage from "./pages/CartPage";
+import ProfilePage from "./pages/ProfilePage";
 
 axios.defaults.baseURL = 'http://localhost:8080';
 
@@ -36,7 +43,6 @@ function App() {
                             <Route path="/products" element={<ProtectedRoute component={ProductListPage} />} />
                             <Route path="/orders" element={<ProtectedRoute component={OrderListPage} />} />
                             <Route path="/products/:productId" element={<ProtectedRoute component={ProductDetailsPage} />} />
-                            <Route path="/reports" element={<ProtectedRoute component={ReportListPage} />} />
                             <Route path="/cart" element={<ProtectedRoute component={CartPage}/>} />
                             <Route path="/profile" element={<ProtectedRoute component={ProfilePage} />} />
                             <Route path="/" element={<Navigate to="/login" replace />} />

@@ -42,13 +42,6 @@ const Navbar = () => {
                                 </Button>
                             )
                         ))}
-                            {/* Admin Links (only visible for SYS_ADMIN or ADMIN roles) */}
-                            {(roles.includes('SYS_ADMIN') || roles.includes('ADMIN')) && (
-                                <>
-                                    <Button color="inherit" component={Link} to="/users" sx={{  fontSize: '13px', fontFamily: 'roboto', fontWeight: '400' }}>Vartotojai</Button>
-                                    <Button color="inherit" component={Link} to="/products" sx={{  fontSize: '13px', fontFamily: 'roboto', fontWeight: '400' }}>Prekės</Button>
-                                </>
-                            )}
 
                         <IconButton color="inherit" component={Link} to="/cart">
                             <Badge badgeContent={cart?.items?.length || 0} color="secondary">

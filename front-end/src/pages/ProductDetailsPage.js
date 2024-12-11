@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useAuth } from "../context/AuthContext";
 import ProductDetail from "../components/ProductDetail"; // Import the new component
 import { Box, CircularProgress, Typography } from '@mui/material';
-import BackButton from "../components/BackButton";
+import BackButton from "../components/Buttons/BackButton";
 
 const ProductDetailsPage = () => {
     const { productId } = useParams();
