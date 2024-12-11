@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, {createContext, useContext, useState, useEffect, useCallback} from 'react';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
 import { Snackbar, Alert } from '@mui/material';
@@ -9,36 +9,34 @@ const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-    const { user, token } = useAuth();
+    const { user, token, loading } = useAuth();
     const [cart, setCart] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [notification, setNotification] = useState({ open: false, message: '', severity: '' });
 
-
-    useEffect(() => {
-        if (!user || !user.id || !token) {
+    const fetchCart = useCallback(async () => {
+        if (!user || !token) {
             return;
         }
-        const fetchCart = async () => {
-            setLoading(true);
-            try {
-                const response = await axios.get(`/cart/${user.id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                setCart(response.data);
-            } catch (err) {
-                console.error("Failed to fetch cart:", err);
-                setNotification({ open: true, message: 'Nepavyko užkrauti krepšelio.', severity: 'error' });
-            } finally {
-                setLoading(false);
-            }
-        };
-        if (!cart) {
-            fetchCart();
+        try {
+            const response = await axios.get(`/cart/${user.id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setCart(response.data);
+        } catch (err) {
+            console.error("Failed to fetch cart:", err);
+            setNotification({ open: true, message: 'Nepavyko užkrauti krepšelio.', severity: 'error' });
         }
-    }, [user, token, cart]);
+    },[token, user]);
+
+    useEffect(() => {
+        if (loading) {
+            return;
+        }
+        fetchCart();
+    }, [user, token, loading, fetchCart]);
+
     const addItemToCart = async (productId, quantity) => {
         try {
             const response = await axios.post(`/cart/${user.id}/add`, null, {
@@ -78,12 +76,11 @@ export const CartProvider = ({ children }) => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            setCart(response.data)
+            setCart(response.data);
             setNotification({ open: true, message: 'Krepšelis išvalytas sėkmingai!', severity: 'success' });
         } catch (error) {
             console.error("Error clearing cart:", error);
             setNotification({ open: true, message: 'Nepavyko išvalyti krepšelio.', severity: 'error' });
-
         }
     };
 
@@ -95,14 +92,12 @@ export const CartProvider = ({ children }) => {
         <CartContext.Provider
             value={{
                 cart,
-                loading,
                 addItemToCart,
                 removeItemFromCart,
                 clearCart,
             }}
         >
             {children}
-            {/* Snackbar for notifications */}
             <Snackbar
                 open={notification.open}
                 autoHideDuration={3000}

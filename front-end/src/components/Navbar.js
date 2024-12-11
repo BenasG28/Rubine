@@ -44,7 +44,9 @@ const Navbar = () => {
                         ))}
 
                         <IconButton color="inherit" component={Link} to="/cart">
-                            <Badge badgeContent={cart?.items?.length || 0} color="secondary">
+                            <Badge
+                                badgeContent={cart?.items?.reduce((total, item) => total + item.quantity, 0) || 0}
+                                color="secondary">
                                 <ShoppingCartIcon />
                             </Badge>
                         </IconButton>
