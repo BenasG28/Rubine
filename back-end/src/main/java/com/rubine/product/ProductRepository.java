@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p LEFT JOIN FETCH p.productStocks WHERE p.id = :id")
@@ -19,4 +20,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
            or lower(p.brand) like lower(concat('%', :query, '%'))
            or lower(p.color) like lower(concat('%', :query, '%'))
            """)
-    List<Product> findBySearchQuery(String query);} // Prideti pagination jei reikes.
+    List<Product> findBySearchQuery(String query); // Prideti pagination jei reikes.
+
+    @Query("SELECT p FROM Product p WHERE " +
+            "(:color IS NULL OR p.color = :color) AND " +
+            "(:productType IS NULL OR p.productType = :productType)")
+    List<Product> findByColorAndType(@Param("color") String color, @Param("productType") ProductType productType);
+}
+
+

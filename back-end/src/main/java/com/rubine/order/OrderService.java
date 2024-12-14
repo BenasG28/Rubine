@@ -2,6 +2,9 @@ package com.rubine.order;
 
 import com.rubine.cart.Cart;
 import com.rubine.cart.CartService;
+import com.rubine.exception.InsufficientStockException;
+import com.rubine.product.ProductStock;
+import com.rubine.product.ProductStockRepository;
 import com.rubine.user.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -16,13 +19,15 @@ import java.util.Optional;
 public class OrderService {
 
     private final CartService cartService;
-    private OrderRepository orderRepository;
-    private UserService userService;
+    private final ProductStockRepository productStockRepository;
+    private final OrderRepository orderRepository;
+    private final UserService userService;
 
-    public OrderService(OrderRepository orderRepository, UserService userService, CartService cartService) {
+    public OrderService(OrderRepository orderRepository, UserService userService, CartService cartService, ProductStockRepository productStockRepository) {
         this.orderRepository = orderRepository;
         this.userService = userService;
         this.cartService = cartService;
+        this.productStockRepository = productStockRepository;
     }
 
     // Get all orders
@@ -80,19 +85,33 @@ public class OrderService {
         boolean isPaid = processPayment(paymentMethodEnum, cardNumber);
 
         Order order = new Order();
-        order.setUser(user);
-        order.setStatus(isPaid ? OrderStatus.COMPLETED : OrderStatus.PENDING);
-        order.setDateCreated(LocalDate.now());
         List<LineItem> lineItems = cart.getItems()
                 .stream()
                 .map(item -> {
+                    ProductStock productStock = productStockRepository.findByProductIdAndSize(
+                            item.getProduct().getId(),
+                            item.getProductSize()
+                    );
+
+                    if (productStock.getQuantity() < item.getQuantity()) {
+                        throw new InsufficientStockException("Dydžio " + item.getProductSize() + " nebėra");
+                    }
+
+                    productStock.setQuantity(productStock.getQuantity() - item.getQuantity());
+                    productStockRepository.save(productStock);
+
                     LineItem lineItem = new LineItem();
                     lineItem.setQuantity(item.getQuantity());
                     lineItem.setProductId(item.getProduct().getId());
+                    lineItem.setProductSize(productStock.getSize());
                     lineItem.setOrder(order);
                     return lineItem;
                 })
                 .toList();
+        order.setUser(user);
+        order.setStatus(isPaid ? OrderStatus.COMPLETED : OrderStatus.PENDING);
+        order.setDateCreated(LocalDate.now());
+        order.setPaymentMethod(paymentMethodEnum);
         order.setLineItems(lineItems);
 
         return orderRepository.saveAndFlush(order);

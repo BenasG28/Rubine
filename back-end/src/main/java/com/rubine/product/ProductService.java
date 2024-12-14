@@ -48,4 +48,8 @@ public class ProductService {
 
         return productRepository.findBySearchQuery(query);
     }
+
+    public List<Product> filterProducts(String color, ProductType productType) {
+        return productRepository.findByColorAndType(color, productType);
+    }
 }

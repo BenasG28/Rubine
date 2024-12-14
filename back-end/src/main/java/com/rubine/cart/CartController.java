@@ -1,5 +1,6 @@
 package com.rubine.cart;
 
+import com.rubine.product.ProductSize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,11 +21,12 @@ public class CartController {
     }
 
     @PostMapping("/{userId}/add")
-    public CartDto addToCart(@PathVariable Long userId, @RequestParam Long productId, @RequestParam int quantity) {
+    public CartDto addToCart(@PathVariable Long userId, @RequestParam Long productId,
+                             @RequestParam int quantity, @RequestParam ProductSize productSize) {
         if (quantity <= 0) {
             throw new IllegalArgumentException("Quantity must be greater than zero");
         }
-        Cart cart = cartService.addItemToCart(userId, productId, quantity);
+        Cart cart = cartService.addItemToCart(userId, productId, quantity, productSize);
         return cartMapper.toCartDto(cart);
     }
 

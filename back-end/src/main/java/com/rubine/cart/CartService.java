@@ -2,6 +2,7 @@ package com.rubine.cart;
 
 import com.rubine.product.Product;
 import com.rubine.product.ProductRepository;
+import com.rubine.product.ProductSize;
 import com.rubine.user.User;
 import com.rubine.user.UserRepository;
 import org.springframework.stereotype.Service;
@@ -13,13 +14,11 @@ import java.util.Optional;
 @Service
 public class CartService {
     private final CartRepository cartRepository;
-    private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
 
-    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, ProductRepository productRepository, UserRepository userRepository) {
+    public CartService(CartRepository cartRepository, ProductRepository productRepository, UserRepository userRepository) {
         this.cartRepository = cartRepository;
-        this.cartItemRepository = cartItemRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
     }
@@ -37,13 +36,13 @@ public class CartService {
         return cart;
     }
 
-    public Cart addItemToCart(Long userId, Long productId, int quantity) {
+    public Cart addItemToCart(Long userId, Long productId, int quantity, ProductSize productSize) {
         Cart cart = getOrCreateCart(userId);
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         Optional<CartItem> existingItem = cart.getItems()
                 .stream()
-                .filter(item -> Objects.equals(item.getProduct().getId(), productId))
+                .filter(item -> Objects.equals(item.getProduct().getId(), productId) && item.getProductSize() == productSize)
                 .findFirst();
 
         if (existingItem.isPresent()) {
@@ -53,6 +52,7 @@ public class CartService {
             CartItem newItem = new CartItem();
             newItem.setCart(cart);
             newItem.setProduct(product);
+            newItem.setProductSize(productSize);
             newItem.setQuantity(quantity);
             newItem.setPrice(product.getPrice());
             cart.getItems().add(newItem);

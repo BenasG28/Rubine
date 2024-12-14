@@ -18,7 +18,7 @@ import axios from "axios";
 import TextField from "@mui/material/TextField";
 
 const CartPage = () => {
-    const { cart, removeItemFromCart, clearCart } = useCart();
+    const { cart, removeItemFromCart, clearCart, cartLoading } = useCart();
     const [totalPrice, setTotalPrice] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const { user, token } = useAuth();
@@ -28,7 +28,7 @@ const CartPage = () => {
 
 
     useEffect(() => {
-        if (cart && cart.items) {
+        if (cart?.items) {
             const total = cart.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
             setTotalPrice(total);
         }
@@ -65,7 +65,8 @@ const CartPage = () => {
             } catch (err) {
                 console.error('Error placing order:', err.response ? err.response.data : err.message);
                 setIsLoading(false);
-                setNotification({ open: true, message: 'Įvyko klaida, bandykite dar kartą.', severity: 'error' });
+                const errorMessage = err.response?.data?.message || 'Įvyko klaida, bandykite dar kartą.';
+                setNotification({ open: true, message: errorMessage, severity: 'error' });
             }
         }
     });
@@ -82,6 +83,16 @@ const CartPage = () => {
     const handlePlaceOrder = () => {
         formik.handleSubmit();
     };
+
+    if (cartLoading) {
+        return (
+            <Container maxWidth="lg" sx={{ mt: 4 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                    <CircularProgress />
+                </Box>
+            </Container>
+        );
+    }
 
     return (
         <Container maxWidth="lg" sx={{ mt: 4 }}>
@@ -217,7 +228,7 @@ const CartPage = () => {
                     <Button
                         onClick={handlePlaceOrder}
                         color="primary"
-                        disabled={isLoading || cart.items.length === 0}
+                        disabled={isLoading}
                     >
                         {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Patvirtinti'}
                     </Button>

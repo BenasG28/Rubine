@@ -14,6 +14,7 @@ const CartItem = ({ item, onRemove }) => {
                     <Typography variant="h6">{item.product.name}</Typography>
                     <Typography variant="body2">Kaina: €{item.product.price}</Typography>
                     <Typography variant="body2">Kiekis: {item.quantity}</Typography>
+                    <Typography variant="body2">Dydis: {item.productSize}</Typography>
                     <Typography variant="body2">Bendra suma: €{item.quantity * item.product.price}</Typography>
                 </CardContent>
             </Box>
