@@ -15,6 +15,7 @@ import ListHeading from "../components/ListHeading";
 import AddButton from "../components/Buttons/AddButton";
 import DeclineButton from "../components/Buttons/DeclineButton";
 import AcceptButton from "../components/Buttons/AcceptButton";
+import Button from "@mui/material/Button";
 
 const ProfilePage = () => {
     const { user } = useAuth();
@@ -65,6 +66,7 @@ const ProfilePage = () => {
                 <ListHeading gutterBottom>
                     Profilio informacija
                 </ListHeading>
+
                 <Divider sx={{ mb: 3 }} />
                 <form onSubmit={handleSubmit(handleSave)}>
                     {[
@@ -152,7 +154,7 @@ const ProfilePage = () => {
                         {isEditMode ? (
                             <>
                                 <DeclineButton onClick={toggleEditMode}></DeclineButton>
-                                <AcceptButton>Išsaugoti</AcceptButton>
+                                <Button type="submit">Išsaugoti</Button>
                             </>
                         ) : (
                             <AddButton onClick={toggleEditMode}>
