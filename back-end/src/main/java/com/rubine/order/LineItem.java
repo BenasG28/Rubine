@@ -18,6 +18,7 @@ public class LineItem {
     private Order order;
     private ProductSize productSize;
     private Long productId;
+    private String productName;
     private int quantity;
 
 }

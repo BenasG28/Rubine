@@ -177,7 +177,16 @@ const UserDetailsDialog = ({ open, onClose, userId, onSave }) => {
                             name="birthDate"
                             control={control}
                             render={({ field }) => (
-                                <TextField {...field} label="Gimimo data" type="date" fullWidth margin="normal" disabled={!isEditMode} error={!!errors.birthDate} helperText={errors.birthDate?.message} />
+                                <TextField
+                                    {...field}
+                                    label="Gimimo data"
+                                    type="date"
+                                    fullWidth
+                                    margin="normal"
+                                    disabled={!isEditMode}
+                                    error={!!errors.birthDate}
+                                    slotProps={{inputLabel: {shrink: true} }}
+                                    helperText={errors.birthDate?.message} />
                             )}
                         />
                         <Controller

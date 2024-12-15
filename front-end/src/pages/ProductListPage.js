@@ -65,7 +65,6 @@ const ProductListPage = () => {
             },
         })
             .then(response => {
-                console.log(response.data);
                 setProducts(response.data)
             })
             .catch(error => console.error("Error fetching products:", error));
@@ -266,14 +265,6 @@ const ProductListPage = () => {
             <Dialog open={openDetails} onClose={handleDetailsClose}>
                 <DialogTitle>Produkto Detalės</DialogTitle>
                 <DialogContent>
-                    {/* Editable size field */}
-                    {/*<TextField*/}
-                    {/*    label="Dydis"*/}
-                    {/*    fullWidth*/}
-                    {/*    value={editProductDetails.size}*/}
-                    {/*    onChange={(e) => setEditProductDetails({ ...editProductDetails, size: e.target.value })}*/}
-                    {/*    sx={{ marginBottom: 2 }}*/}
-                    {/*/>*/}
                     {/* Dydžio pasirinkimas */}
                     <FormControl fullWidth sx={{ marginBottom: 2 }}>
                         <InputLabel>Dydis</InputLabel>

@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from "../context/AuthContext";
-import ProductDetail from "../components/ProductDetail"; // Import the new component
+import ProductDetail from "../components/ProductDetail";
 import {Box, CircularProgress, Container, Typography} from '@mui/material';
-import BackButton from "../components/Buttons/BackButton";
 
 const ProductDetailsPage = () => {
     const { productId } = useParams();

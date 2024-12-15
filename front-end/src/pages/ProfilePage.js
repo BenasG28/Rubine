@@ -29,7 +29,7 @@ const ProfilePage = () => {
             phoneNumber: '',
             gender: '',
             birthDate: '',
-            region: '',
+            selectedRegion: '',
         },
     });
 
@@ -129,7 +129,7 @@ const ProfilePage = () => {
                         )}
                     />
                     <Controller
-                        name="region"
+                        name="selectedRegion"
                         control={control}
                         render={({ field }) => (
                             <TextField
@@ -139,8 +139,8 @@ const ProfilePage = () => {
                                 fullWidth
                                 margin="normal"
                                 disabled={!isEditMode}
-                                error={!!errors.region}
-                                helperText={errors.region?.message}
+                                error={!!errors.selectedRegion}
+                                helperText={errors.selectedRegion?.message}
                             >
                                 <MenuItem value="UK">Jungtinė Karalystė</MenuItem>
                                 <MenuItem value="US">Jungtinės Amerikos Valstijos</MenuItem>
