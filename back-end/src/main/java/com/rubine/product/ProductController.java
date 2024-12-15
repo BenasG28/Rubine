@@ -112,4 +112,17 @@ public ResponseEntity<List<Product>> getAllProducts() {
         return new ResponseEntity<>(productMapper.toProductSearchResultDtoList(products), HttpStatus.OK);
     }
 
+    @GetMapping("/filter")
+    public ResponseEntity<List<Product>> filterProducts(
+            @RequestParam(required = false) String color,
+            @RequestParam(required = false) ProductType productType) {
+
+        List<Product> filteredProducts = productService.filterProducts(color, productType);
+
+        if (filteredProducts.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(filteredProducts);
+    }
 }

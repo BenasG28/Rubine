@@ -11,13 +11,17 @@ export const useCart = () => useContext(CartContext);
 export const CartProvider = ({ children }) => {
     const { user, token, loading } = useAuth();
     const [cart, setCart] = useState(null);
+    const [cartLoading, setCartLoading] = useState(true);
     const [notification, setNotification] = useState({ open: false, message: '', severity: '' });
 
     const fetchCart = useCallback(async () => {
         if (!user || !token) {
+            setCart(null);
+            setCartLoading(false);
             return;
         }
         try {
+            setCartLoading(true);
             const response = await axios.get(`/cart/${user.id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -27,23 +31,25 @@ export const CartProvider = ({ children }) => {
         } catch (err) {
             console.error("Failed to fetch cart:", err);
             setNotification({ open: true, message: 'Nepavyko užkrauti krepšelio.', severity: 'error' });
+        } finally {
+            setCartLoading(false);
         }
     },[token, user]);
 
     useEffect(() => {
-        if (loading) {
-            return;
+        if (user && token && !loading) {
+            fetchCart();
         }
-        fetchCart();
     }, [user, token, loading, fetchCart]);
 
-    const addItemToCart = async (productId, quantity) => {
+    const addItemToCart = async (productId, quantity, productSize) => {
+        console.log('ps', productSize);
         try {
             const response = await axios.post(`/cart/${user.id}/add`, null, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
-                params: { productId, quantity },
+                params: { productId, quantity, productSize },
             });
             setCart(response.data);
             setNotification({ open: true, message: 'Prekė pridėta į krepšelį sėkmingai!', severity: 'success' });

@@ -1,6 +1,7 @@
 package com.rubine.cart;
 
 import com.rubine.product.Product;
+import com.rubine.product.ProductSize;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +23,9 @@ public class CartItem {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    ProductSize productSize;
     private int quantity;
     private double price;
 
