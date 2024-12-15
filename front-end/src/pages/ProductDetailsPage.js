@@ -3,7 +3,7 @@ import { useParams, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from "../context/AuthContext";
 import ProductDetail from "../components/ProductDetail"; // Import the new component
-import { Box, CircularProgress, Typography } from '@mui/material';
+import {Box, CircularProgress, Container, Typography} from '@mui/material';
 import BackButton from "../components/Buttons/BackButton";
 
 const ProductDetailsPage = () => {
@@ -58,10 +58,11 @@ const ProductDetailsPage = () => {
     }
 
     return (
-        <Box sx={{ padding: 2 }}>
-            <BackButton to="/main" />
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+            <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <ProductDetail product={product} />
         </Box>
+        </Container>
     );};
 
 export default ProductDetailsPage;

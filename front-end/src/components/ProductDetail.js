@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Typography, Box, CardMedia, Button, FormHelperText } from '@mui/material';
+import {Typography, Box, CardMedia, Button, FormHelperText, Container} from '@mui/material';
 import { useCart } from "../context/CartContext";
 
 const availableSizes = ['S', 'M', 'L'];  // The available sizes in the system (enum or predefined list)
@@ -39,16 +39,8 @@ const ProductDetail = ({ product }) => {
     };
 
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                flexDirection: { xs: 'column', md: 'row' }, // Stacks on small screens, side-by-side on larger screens
-                maxWidth: 1200,
-                margin: '0 auto',
-                gap: 4,
-                padding: 2,
-            }}
-        >
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+            <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             {/* Product Image */}
             <CardMedia
                 component="img"
@@ -170,6 +162,7 @@ const ProductDetail = ({ product }) => {
                 </Button>
             </Box>
         </Box>
+        </Container>
     );
 };
 

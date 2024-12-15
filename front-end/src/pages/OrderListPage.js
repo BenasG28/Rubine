@@ -3,13 +3,27 @@ import { useAuth } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
 import axios from 'axios';
 import {
-    Button, Table, TableBody, TableCell, TableHead,
-    TableRow, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Box, MenuItem, Select, Stack, IconButton
+    Button,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    Box,
+    MenuItem,
+    Select,
+    Stack,
+    IconButton,
+    Container
 } from '@mui/material';
 import AddButton from "../components/Buttons/AddButton";
 import ReportDownloadDialog from "../components/ReportDownloadDialog";
 import ListHeading from "../components/ListHeading";
-import StartingBox from "../components/StartingBox";
 import DeclineButton from "../components/Buttons/DeclineButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -103,8 +117,8 @@ const OrderListPage = () => {
     }
 
     return (
-       <StartingBox>
-            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+           <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                <ListHeading>Užsakymų sąrašas</ListHeading>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <AddButton onClick={handleReportOpenDialog}>ATSISIŲSKIT ATASKAITĄ</AddButton>
@@ -113,7 +127,7 @@ const OrderListPage = () => {
             </Box>
 
             <TableBox>
-                <Table sx={{ minWidth: '1200px' }}>
+                <Table>
                     <TableHead>
                         <TableRow>
                             <TableCell>Sukūrimo data</TableCell>
@@ -146,7 +160,7 @@ const OrderListPage = () => {
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={6} align="center">
-                                    No orders available
+                                    Jūs neturite užsakymų
                                 </TableCell>
                             </TableRow>
                         )}
@@ -190,13 +204,13 @@ const OrderListPage = () => {
                         variant="outlined"
                         margin="dense"
                     >
-                        <MenuItem value="PENDING">Pending</MenuItem>
-                        <MenuItem value="COMPLETED">Completed</MenuItem>
+                        <MenuItem value="PENDING">Ruošiama</MenuItem>
+                        <MenuItem value="COMPLETED">Atlika</MenuItem>
                     </Select>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="secondary">Cancel</Button>
-                    <Button onClick={handleCreateOrder} color="primary">Create</Button>
+                    <DeclineButton onClick={handleClose}></DeclineButton>
+                    <AddButton onClick={handleCreateOrder}>Sukurti</AddButton>
                 </DialogActions>
             </Dialog>
             {/* Dialog for report */}
@@ -224,7 +238,7 @@ const OrderListPage = () => {
                         type="date"
                         fullWidth
                         value={editOrder?.dateCreated || ""}
-                        slotProps={{inputLabel: {shrink: true} }}
+                        slotProps={{inputLabel: {shrink:true}}}
                         onChange={(e) => setEditOrder({ ...editOrder, dateCreated: e.target.value })}
                     />
                     <TextField
@@ -259,7 +273,7 @@ const OrderListPage = () => {
                     <Button onClick={handleEditOrder} color="primary">Atnaujinti</Button>
                 </DialogActions>
             </Dialog>
-       </StartingBox>
+        </Container>
     );
 };
 

@@ -16,8 +16,8 @@ const ProductCard = ({ product }) => {
             {/* Image */}
             <CardMedia
                 component="img"
-                width="300"
-                height="400"  // Increase the height for a larger image
+                width="400"
+                height="500"  // Increase the height for a larger image
                 image={product.imageUrl}
                 alt={product.name}
                 sx={{ objectFit: 'cover', borderTopLeftRadius: 2, borderTopRightRadius: 2 }}  // Rounded corners for the image
@@ -26,7 +26,7 @@ const ProductCard = ({ product }) => {
             {/* Text Content */}
             <CardContent sx={{ padding: 2 }}>
                 {/* Product Description */}
-                <Typography sx={{ fontSize: '14px', fontFamily: 'roboto', fontWeight: '400' }}>
+                <Typography sx={{ fontSize: '16px', fontFamily: 'roboto', fontWeight: '300' }}>
                     {product.description.length > 100 ? `${product.description.slice(0, 100)}...` : product.description}
                 </Typography>
 

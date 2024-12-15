@@ -16,7 +16,7 @@ import {
     TextField,
     Box,
     RadioGroup,
-    FormControlLabel, Radio, IconButton, Stack
+    FormControlLabel, Radio, IconButton, Stack, FormControl, InputLabel, Select, MenuItem, Container
 } from '@mui/material';
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from '@mui/icons-material/Edit';
@@ -25,7 +25,6 @@ import DeclineButton from "../components/Buttons/DeclineButton";
 import AcceptButton from "../components/Buttons/AcceptButton";
 import AddButton from "../components/Buttons/AddButton";
 import ListHeading from "../components/ListHeading";
-import StartingBox from "../components/StartingBox";
 import ReportDownloadDialog from "../components/ReportDownloadDialog";
 import TableBox from "../components/TableBox";
 
@@ -42,7 +41,7 @@ const ProductListPage = () => {
     const [endDate, setEndDate] = useState("");
     const [allData, setAllData] = useState(false);
     const [productType, setProductType] = useState("");
-
+    const sizes = ['s', 'm', 'l'];
     const [newProduct, setNewProduct] = useState({
         brand: '',
         color: '',
@@ -196,8 +195,8 @@ const ProductListPage = () => {
     const handleReportCloseDialog = () => setDialogOpen(false);
 
     return (
-        <StartingBox>
-            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+            <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                <ListHeading>Produktų sąrašas</ListHeading>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <AddButton onClick={handleReportOpenDialog}>ATSISIŲSKIT ATASKAITĄ</AddButton>
@@ -206,7 +205,7 @@ const ProductListPage = () => {
             </Box>
 
             <TableBox>
-                <Table sx={{ minWidth: '1200px' }}>
+                <Table>
                     <TableHead>
                         <TableRow>
                             <TableCell>Produkto prekinis ženklas</TableCell>
@@ -232,7 +231,7 @@ const ProductListPage = () => {
                                             <Typography key={stock.id} sx={{    fontSize: '15px',
                                                 fontFamily: 'Roboto',
                                                 fontWeight: 300,}}>
-                                                {`Dydis: ${stock.size}, Kiekis: ${stock.quantity}`}
+                                                {`Dydis: ${stock.size} Kiekis: ${stock.quantity}`}
                                             </Typography>
                                         ))}
                                     </TableCell>
@@ -267,20 +266,29 @@ const ProductListPage = () => {
             <Dialog open={openDetails} onClose={handleDetailsClose}>
                 <DialogTitle>Produkto Detalės</DialogTitle>
                 <DialogContent>
-                    <Typography variant="h6">Produkto prekinis ženklas: {selectedProduct?.brand}</Typography>
-                    <Typography variant="body1">Spalva: {selectedProduct?.color}</Typography>
-                    <Typography variant="body1">Aprašymas: {selectedProduct?.description}</Typography>
-                    <Typography variant="body1">Kaina: {selectedProduct?.price} EUR</Typography>
-                    <Typography variant="body1">Produkto tipas: {selectedProduct?.productType}</Typography>
-
                     {/* Editable size field */}
-                    <TextField
-                        label="Dydis"
-                        fullWidth
-                        value={editProductDetails.size}
-                        onChange={(e) => setEditProductDetails({ ...editProductDetails, size: e.target.value })}
-                        sx={{ marginBottom: 2 }}
-                    />
+                    {/*<TextField*/}
+                    {/*    label="Dydis"*/}
+                    {/*    fullWidth*/}
+                    {/*    value={editProductDetails.size}*/}
+                    {/*    onChange={(e) => setEditProductDetails({ ...editProductDetails, size: e.target.value })}*/}
+                    {/*    sx={{ marginBottom: 2 }}*/}
+                    {/*/>*/}
+                    {/* Dydžio pasirinkimas */}
+                    <FormControl fullWidth sx={{ marginBottom: 2 }}>
+                        <InputLabel>Dydis</InputLabel>
+                        <Select
+                            value={editProductDetails.size}
+                            onChange={(e) => setEditProductDetails({ ...editProductDetails, size: e.target.value })}
+                            label="Dydis"
+                        >
+                            {sizes.map((size) => (
+                                <MenuItem key={size} value={size}>
+                                    {size.toUpperCase()} {/* Rodo dydį didžiosiomis raidėmis */}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
 
                     {/* Editable stock field */}
                     <TextField
@@ -341,6 +349,7 @@ const ProductListPage = () => {
                         label="Kaina"
                         type="number"
                         fullWidth
+
                         value={newProduct.price}
                         onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
                     />
@@ -420,12 +429,13 @@ const ProductListPage = () => {
                         onChange={(e) => setEditProduct({ ...editProduct, price: e.target.value })}
                     />
                     <RadioGroup
-                        row
-                        value={editProduct?.productType || ""}
-                        onChange={(e) => setEditProduct({ ...editProduct, productType: e.target.value })}
-                    >
-                        <FormControlLabel value="UPPERBODY" control={<Radio />} label="Viršutinė Kūno Dalis" />
-                        <FormControlLabel value="LOWERBODY" control={<Radio />} label="Apatinė Kūno Dalis" />
+                    row
+                    value={editProduct?.productType || ""}
+                    onChange={(e) => setEditProduct({ ...editProduct, productType: e.target.value })}
+                >
+                    <FormControlLabel value="UPPERBODY" control={<Radio />} label="Viršutinė Kūno Dalis" />
+                    <FormControlLabel value="LOWERBODY" control={<Radio />} label="Apatinė Kūno Dalis" />
+
                     </RadioGroup>
                 </DialogContent>
                 <DialogActions>
@@ -433,7 +443,7 @@ const ProductListPage = () => {
                     <AcceptButton onClick={handleEditProduct}>Atnaujinti</AcceptButton>
                 </DialogActions>
             </Dialog>
-        </StartingBox>
+</Container>
     );
 };
 export default ProductListPage;

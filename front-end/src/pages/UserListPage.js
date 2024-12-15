@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {
     Alert,
-    Box, IconButton,
+    Box, Container, IconButton,
     Snackbar, Stack,
     Table,
     TableBody,
@@ -12,7 +12,6 @@ import {
     TableHead,
     TableRow,
 } from "@mui/material";
-import StartingBox from "../components/StartingBox";
 import AddButton from "../components/Buttons/AddButton";
 import ListHeading from "../components/ListHeading";
 import ReportDownloadDialog from "../components/ReportDownloadDialog";
@@ -119,8 +118,8 @@ const UserListPage = () => {
     };
 
     return (
-        <StartingBox>
-            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+            <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <ListHeading>Vartotojai</ListHeading>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <AddButton onClick={handleReportOpenDialog}>ATSISIŲSKIT ATASKAITĄ</AddButton>
@@ -129,7 +128,7 @@ const UserListPage = () => {
             </Box>
 
             <TableBox>
-                <Table sx={{ minWidth: '1200px' }}>
+                <Table>
                     <TableHead>
                         <TableRow>
                             <TableCell>Vardas</TableCell>
@@ -188,7 +187,7 @@ const UserListPage = () => {
                     {error}
                 </Alert>
             </Snackbar>
-        </StartingBox>
+        </Container>
     );
 };
 
