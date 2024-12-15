@@ -1,6 +1,7 @@
 package com.rubine.order;
 
 import com.rubine.cart.Cart;
+import com.rubine.cart.CartItem;
 import com.rubine.cart.CartService;
 import com.rubine.exception.InsufficientStockException;
 import com.rubine.product.ProductStock;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.rubine.user.User;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +40,10 @@ public class OrderService {
     // Get an order by ID
     public Optional<Order> getOrderById(Long id) {
         return orderRepository.findById(id);
+    }
+
+    public List<Order> getOrdersByUserId(Long userId) {
+        return orderRepository.findByUserId(userId);
     }
 
     // Create a new order
@@ -85,34 +91,40 @@ public class OrderService {
         boolean isPaid = processPayment(paymentMethodEnum, cardNumber);
 
         Order order = new Order();
-        List<LineItem> lineItems = cart.getItems()
-                .stream()
-                .map(item -> {
-                    ProductStock productStock = productStockRepository.findByProductIdAndSize(
-                            item.getProduct().getId(),
-                            item.getProductSize()
-                    );
+        double totalPurchaseAmount = 0;
+        List<LineItem> lineItems = new ArrayList<>();
+        for (CartItem cartItem : cart.getItems()) {
+            ProductStock productStock = productStockRepository.findByProductIdAndSize(
+                    cartItem.getProduct().getId(),
+                    cartItem.getProductSize()
+            );
 
-                    if (productStock.getQuantity() < item.getQuantity()) {
-                        throw new InsufficientStockException("Dydžio " + item.getProductSize() + " nebėra");
-                    }
+            if (productStock.getQuantity() < cartItem.getQuantity()) {
+                throw new InsufficientStockException("Size " + cartItem.getProductSize() + " is out of stock.");
+            }
 
-                    productStock.setQuantity(productStock.getQuantity() - item.getQuantity());
-                    productStockRepository.save(productStock);
+            productStock.setQuantity(productStock.getQuantity() - cartItem.getQuantity());
+            productStockRepository.save(productStock);
 
-                    LineItem lineItem = new LineItem();
-                    lineItem.setQuantity(item.getQuantity());
-                    lineItem.setProductId(item.getProduct().getId());
-                    lineItem.setProductSize(productStock.getSize());
-                    lineItem.setOrder(order);
-                    return lineItem;
-                })
-                .toList();
+            // Create LineItem
+            LineItem lineItem = new LineItem();
+            lineItem.setQuantity(cartItem.getQuantity());
+            lineItem.setProductId(cartItem.getProduct().getId());
+            lineItem.setProductSize(productStock.getSize());
+            lineItem.setProductName(cartItem.getProduct().getDescription());
+            lineItem.setOrder(order);
+
+            lineItems.add(lineItem);
+
+            // Accumulate total price
+            totalPurchaseAmount += cartItem.getTotalPrice();
+        }
         order.setUser(user);
         order.setStatus(isPaid ? OrderStatus.COMPLETED : OrderStatus.PENDING);
         order.setDateCreated(LocalDate.now());
         order.setPaymentMethod(paymentMethodEnum);
         order.setLineItems(lineItems);
+        order.setPurchaseAmount(totalPurchaseAmount);
 
         return orderRepository.saveAndFlush(order);
     }

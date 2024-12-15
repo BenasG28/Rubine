@@ -34,6 +34,15 @@ public class OrderController {
         }
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<OrderDto>> getOrdersByUserId(@PathVariable Long userId) {
+        List<Order> orders = orderService.getOrdersByUserId(userId);
+        if (orders.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(orderMapper.toOrderDtoList(orders));
+    }
+
     // Get order by ID
     @GetMapping("/{id}")
     public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
@@ -47,10 +56,10 @@ public class OrderController {
 
     // Update order by ID
     @PutMapping("/update/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody Order updatedOrder) {
+    public ResponseEntity<OrderDto> updateOrder(@PathVariable Long id, @RequestBody Order updatedOrder) {
         Order updated = orderService.updateOrder(id, updatedOrder);  // Call service to update order
         if (updated != null) {
-            return new ResponseEntity<>(updated, HttpStatus.OK); // 200 OK with updated order
+            return new ResponseEntity<>(orderMapper.toOrderDto(updated), HttpStatus.OK); // 200 OK with updated order
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404 Not Found if order does not exist
         }

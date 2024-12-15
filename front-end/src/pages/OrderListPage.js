@@ -19,7 +19,7 @@ import {
     Select,
     Stack,
     IconButton,
-    Container
+    Container, FormControl, InputLabel, Typography, List, ListItem, Divider
 } from '@mui/material';
 import AddButton from "../components/Buttons/AddButton";
 import ReportDownloadDialog from "../components/ReportDownloadDialog";
@@ -28,19 +28,21 @@ import DeclineButton from "../components/Buttons/DeclineButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import TableBox from "../components/TableBox";
+import InfoIcon from "@mui/icons-material/Info";
 // TODO Make radio buttons for statuses
 const OrderListPage = () => {
-    const { isAuthenticated, token } = useAuth(); // Use token from AuthContext
+    const { isAuthenticated, token, roles, user } = useAuth(); // Use token from AuthContext
     const [orders, setOrders] = useState([]);
     const [open, setOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
     const [editOrder, setEditOrder] = useState(null);
-    // report dialog
     const [dialogOpen, setDialogOpen] = useState(false);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [allData, setAllData] = useState(false);
     const [productType, setProductType] = useState("");
+    const [viewOrder, setViewOrder] = useState(null);
+    const [viewOpen, setViewOpen] = useState(false);
     const [newOrder, setNewOrder] = useState({
         dateCreated: '',
         purchaseAmount: '',
@@ -49,19 +51,33 @@ const OrderListPage = () => {
     });
 
     useEffect(() => {
-        axios.get("/orders/all", {
-            headers: { 'Authorization': `Bearer ${token}` },
-        })
-            .then(response => setOrders(response.data))
-            .catch(error => console.error("Error fetching orders:", error));
-    }, [token]);
+        if (isAuthenticated && (roles.includes('ADMIN') || roles.includes('SYS_ADMIN'))) {
+            axios.get("/orders/all", {
+                headers: { 'Authorization': `Bearer ${token}` },
+            })
+                .then(response => setOrders(response.data))
+                .catch(error => console.error("Error fetching orders:", error));
+        }
+
+        if (isAuthenticated && (roles.includes('USER'))) {
+            axios.get(`/orders/user/${user.id}`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+            })
+                .then(response => setOrders(response.data))
+                .catch(error => console.error("Error fetching orders:", error));
+        }
+
+    }, [isAuthenticated, roles, token, user]);
+
+    if (!isAuthenticated) {
+        return <Navigate to={"/login"} replace />;
+    }
 
     const handleCreateOrder = () => {
         const formattedOrder = {
             ...newOrder,
             user: { id: newOrder.user },
         };
-
 
         axios.post('/orders/create', formattedOrder, {
             headers: { 'Authorization': `Bearer ${token}` },
@@ -72,6 +88,16 @@ const OrderListPage = () => {
                 handleClose();
             })
             .catch(error => console.error("Error creating order:", error));
+    };
+
+    const handleViewOpen = (order) => {
+        setViewOrder(order);
+        setViewOpen(true);
+    };
+
+    const handleViewClose = () => {
+        setViewOpen(false);
+        setViewOrder(null);
     };
 
     const handleEditOrder = () => {
@@ -121,7 +147,9 @@ const OrderListPage = () => {
            <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                <ListHeading>Užsakymų sąrašas</ListHeading>
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                    <AddButton onClick={handleReportOpenDialog}>ATSISIŲSKIT ATASKAITĄ</AddButton>
+                    {roles.includes("ADMIN") || roles.includes("SYS_ADMIN") ? (
+                        <AddButton onClick={handleReportOpenDialog}>ATSISIŲSKIT ATASKAITĄ</AddButton>
+                    ) : null}
                     <AddButton onClick={handleClickOpen}>NAUJAS UŽSAKYMAS</AddButton>
                 </Box>
             </Box>
@@ -133,7 +161,9 @@ const OrderListPage = () => {
                             <TableCell>Sukūrimo data</TableCell>
                             <TableCell>Suma</TableCell>
                             <TableCell>Statusas</TableCell>
-                            <TableCell>Vartotojas</TableCell>
+                            {roles.includes("ADMIN") || roles.includes("SYS_ADMIN") ? (
+                                <TableCell>Vartotojas</TableCell>
+                            ) : null}
                             <TableCell>Veiksmai</TableCell>
                         </TableRow>
                     </TableHead>
@@ -142,17 +172,26 @@ const OrderListPage = () => {
                             orders.map((order) => (
                                 <TableRow key={order.id}>
                                     <TableCell>{order.dateCreated}</TableCell>
-                                    <TableCell>{order.purchaseAmount}</TableCell>
+                                    <TableCell>{order.purchaseAmount?.toFixed(2)}</TableCell>
                                     <TableCell>{order.status}</TableCell>
-                                    <TableCell>{order.user.id || order.user.name}</TableCell>
+                                    {roles.includes("ADMIN") || roles.includes("SYS_ADMIN") ? (
+                                        <TableCell>{order.user.id || order.user.name}</TableCell>
+                                    ) : null}
                                     <TableCell>
-                                        <Stack direction="row" >
-                                            <IconButton onClick={() => handleEditOpen(order)} sx={{ color: '#000', fontWeight: '300' }}>
-                                                <EditIcon />
+                                        <Stack direction="row">
+                                            <IconButton onClick={() => handleViewOpen(order)} sx={{ color: '#000', fontWeight: '300' }}>
+                                                <InfoIcon/>
                                             </IconButton>
-                                            <IconButton onClick={() => handleDeleteOrder(order.id)} sx={{ color: '#DC143C' }}>
-                                                <DeleteIcon />
-                                            </IconButton>
+                                            {(roles.includes('ADMIN') || roles.includes('SYS_ADMIN')) && (
+                                                <>
+                                                    <IconButton onClick={() => handleEditOpen(order)} sx={{ color: '#000', fontWeight: '300' }}>
+                                                        <EditIcon />
+                                                    </IconButton>
+                                                    <IconButton onClick={() => handleDeleteOrder(order.id)} sx={{ color: '#DC143C' }}>
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                </>
+                                            )}
                                         </Stack>
                                     </TableCell>
                                 </TableRow>
@@ -169,12 +208,12 @@ const OrderListPage = () => {
                 </TableBox>
             {/* Dialog for order creation */}
             <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Add New Order</DialogTitle>
+                <DialogTitle>Pridėti naują užsakymą</DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
                         margin="dense"
-                        label="Date Created"
+                        label="Sukūrimo data"
                         type="date"
                         fullWidth
                         value={newOrder.dateCreated}
@@ -183,7 +222,7 @@ const OrderListPage = () => {
                     />
                     <TextField
                         margin="dense"
-                        label="Purchase Amount"
+                        label="Užsakymo suma"
                         type="number"
                         fullWidth
                         value={newOrder.purchaseAmount}
@@ -191,26 +230,27 @@ const OrderListPage = () => {
                     />
                     <TextField
                         margin="dense"
-                        label="User ID"
+                        label="Vartotojo ID"
                         type="text"
                         fullWidth
                         value={newOrder.user}
                         onChange={(e) => setNewOrder({ ...newOrder, user: e.target.value })}
                     />
-                    <Select
-                        fullWidth
-                        value={newOrder.status}
-                        onChange={(e) => setNewOrder({ ...newOrder, status: e.target.value })}
-                        variant="outlined"
-                        margin="dense"
-                    >
-                        <MenuItem value="PENDING">Ruošiama</MenuItem>
-                        <MenuItem value="COMPLETED">Atlika</MenuItem>
-                    </Select>
+                    <FormControl fullWidth variant="outlined" margin="dense">
+                        <InputLabel>Statusas</InputLabel>
+                        <Select
+                            value={newOrder.status}
+                            onChange={(e) => setNewOrder({ ...newOrder, status: e.target.value })}
+                            label="Statusas"
+                        >
+                            <MenuItem value="PENDING">Laukiama</MenuItem>
+                            <MenuItem value="COMPLETED">Užbaigtas</MenuItem>
+                        </Select>
+                    </FormControl>
                 </DialogContent>
                 <DialogActions>
                     <DeclineButton onClick={handleClose}></DeclineButton>
-                    <AddButton onClick={handleCreateOrder}>Sukurti</AddButton>
+                    <Button onClick={handleCreateOrder} color="primary">Sukurti</Button>
                 </DialogActions>
             </Dialog>
             {/* Dialog for report */}
@@ -229,12 +269,12 @@ const OrderListPage = () => {
             />
             {/* Dialog for editing an order */}
             <Dialog open={editOpen} onClose={handleEditClose}>
-                <DialogTitle>Edit Order</DialogTitle>
+                <DialogTitle>Redaguoti užsakymą</DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
                         margin="dense"
-                        label="Date Created"
+                        label="Sukūrimo data"
                         type="date"
                         fullWidth
                         value={editOrder?.dateCreated || ""}
@@ -243,7 +283,7 @@ const OrderListPage = () => {
                     />
                     <TextField
                         margin="dense"
-                        label="Purchase Amount"
+                        label="Užsakymo suma"
                         type="number"
                         fullWidth
                         value={editOrder?.purchaseAmount || ""}
@@ -251,26 +291,110 @@ const OrderListPage = () => {
                     />
                     <TextField
                         margin="dense"
-                        label="User ID"
+                        label="Vartotojo ID"
                         type="text"
                         fullWidth
                         value={editOrder?.user.id || ""}
                         onChange={(e) => setEditOrder({ ...editOrder, user: e.target.value })}
                     />
-                    <Select
-                        fullWidth
-                        value={editOrder?.status || ""}
-                        onChange={(e) => setEditOrder({ ...editOrder, status: e.target.value })}
-                        variant="outlined"
-                        margin="dense"
-                    >
-                        <MenuItem value="PENDING">Ruošiama</MenuItem>
-                        <MenuItem value="COMPLETED">Paruoštas</MenuItem>
-                    </Select>
+                    <FormControl fullWidth variant="outlined" margin="dense">
+                        <InputLabel>Statusas</InputLabel>
+                        <Select
+                            value={editOrder?.status || ""}
+                            onChange={(e) => setNewOrder({ ...newOrder, status: e.target.value })}
+                            label="Statusas" // Make sure the label is linked with the Select component
+                        >
+                            <MenuItem value="PENDING">Laukiama</MenuItem>
+                            <MenuItem value="COMPLETED">Užbaigtas</MenuItem>
+                        </Select>
+                    </FormControl>
                 </DialogContent>
                 <DialogActions>
-                    <DeclineButton onClick={handleEditClose}></DeclineButton>
+                    <DeclineButton onClick={handleEditClose}>Atšaukti</DeclineButton>
                     <Button onClick={handleEditOrder} color="primary">Atnaujinti</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={viewOpen} onClose={handleViewClose}>
+                <DialogTitle>Užsakymo detalės</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        margin="dense"
+                        label="Sukūrimo data"
+                        type="text"
+                        fullWidth
+                        InputProps={{ readOnly: true }}
+                        value={viewOrder?.dateCreated || ""}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Užsakymo suma (€)"
+                        type="text"
+                        fullWidth
+                        InputProps={{ readOnly: true }}
+                        value={viewOrder?.purchaseAmount.toFixed(2) || ""}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Vartotojas"
+                        type="text"
+                        fullWidth
+                        InputProps={{ readOnly: true }}
+                        value={`${viewOrder?.user?.name || ""} ${viewOrder?.user?.surname || ""}` || viewOrder.user.id}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Vartotojo el. paštas"
+                        type="email"
+                        fullWidth
+                        InputProps={{ readOnly: true }}
+                        value={viewOrder?.user?.email || ""}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Statusas"
+                        type="text"
+                        fullWidth
+                        InputProps={{ readOnly: true }}
+                        value={viewOrder?.status === "PENDING" ? "Laukiama" : "Užbaigtas"}
+                    />
+                    <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>Prekės</Typography>
+                    <List>
+                        {viewOrder?.lineItems?.map((item, index) => (
+                            <React.Fragment key={item.id}>
+                                <ListItem sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: '100%' }}>
+                                    {roles.includes("ADMIN") || roles.includes("SYS_ADMIN") ? (
+                                        <TextField
+                                            label="Prekės ID"
+                                            value={item.productId}
+                                            margin="dense"
+                                            fullWidth
+                                            InputProps={{ readOnly: true }}
+                                        />
+                                    ) : null}
+                                    <TextField
+                                        label="Prekės pavadinimas"
+                                        value={item.productName}
+                                        margin="dense"
+                                        fullWidth
+                                        InputProps={{ readOnly: true }}
+                                    />
+                                    <TextField
+                                        label="Kiekis"
+                                        value={item.quantity}
+                                        margin="dense"
+                                        fullWidth
+                                        InputProps={{ readOnly: true }}
+                                    />
+                                </ListItem>
+                                {/* Divider between items, not after the last one */}
+                                {index < viewOrder?.lineItems?.length - 1 && <Divider />}
+                            </React.Fragment>
+                        ))}
+                    </List>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleViewClose} color="primary">Uždaryti</Button>
                 </DialogActions>
             </Dialog>
         </Container>

@@ -9,5 +9,6 @@ public class LineItemDto {
     private Long id;
     private Long productId;
     private int quantity;
+    private String productName;
 
 }
